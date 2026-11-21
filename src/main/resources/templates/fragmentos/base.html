@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="cabecera(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' | Transportes Andinos'">Transportes Andinos</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/icono.svg}">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+
+<aside class="menu-lateral" th:fragment="menu(activo)">
+    <a class="marca" th:href="@{/}">
+        <span class="marca-simbolo"><th:block th:replace="~{fragmentos/iconos :: montanas}"></th:block></span>
+        <span class="marca-texto"><strong>Transportes</strong><small>Andinos</small></span>
+    </a>
+    <nav>
+        <p class="menu-seccion">Principal</p>
+        <a class="menu-enlace" th:classappend="${activo == 'panel'} ? 'activo'" th:href="@{/}">
+            <th:block th:replace="~{fragmentos/iconos :: casa}"></th:block><span>Inicio</span>
+        </a>
+
+        <p class="menu-seccion">Ventas</p>
+        <a class="menu-enlace" th:classappend="${activo == 'pasajeros'} ? 'activo'" th:href="@{/pasajeros}">
+            <th:block th:replace="~{fragmentos/iconos :: usuarios}"></th:block><span>Pasajeros</span>
+        </a>
+        <a class="menu-enlace" th:classappend="${activo == 'venta'} ? 'activo'" th:href="@{/reservas/viajes}">
+            <th:block th:replace="~{fragmentos/iconos :: pasaje}"></th:block><span>Vender pasajes</span>
+        </a>
+        <a class="menu-enlace" th:classappend="${activo == 'reservas'} ? 'activo'" th:href="@{/reservas}">
+            <th:block th:replace="~{fragmentos/iconos :: reserva}"></th:block><span>Reservas</span>
+        </a>
+        <a class="menu-enlace" th:classappend="${activo == 'pasajes'} ? 'activo'" th:href="@{/pasajes}">
+            <th:block th:replace="~{fragmentos/iconos :: dinero}"></th:block><span>Pasajes vendidos</span>
+        </a>
+        <a class="menu-enlace" th:classappend="${activo == 'reportes'} ? 'activo'" th:href="@{/reportes}">
+            <th:block th:replace="~{fragmentos/iconos :: grafico}"></th:block><span>Reportes</span>
+        </a>
+
+        <div class="menu-grupo" sec:authorize="hasRole('ADMIN')">
+            <p class="menu-seccion">Administración</p>
+            <a class="menu-enlace" th:classappend="${activo == 'viajes'} ? 'activo'" th:href="@{/viajes}">
+                <th:block th:replace="~{fragmentos/iconos :: calendario}"></th:block><span>Programar viajes</span>
+            </a>
+            <a class="menu-enlace" th:classappend="${activo == 'buses'} ? 'activo'" th:href="@{/buses}">
+                <th:block th:replace="~{fragmentos/iconos :: bus}"></th:block><span>Buses</span>
+            </a>
+            <a class="menu-enlace" th:classappend="${activo == 'conductores'} ? 'activo'" th:href="@{/conductores}">
+                <th:block th:replace="~{fragmentos/iconos :: volante}"></th:block><span>Conductores</span>
+            </a>
+            <a class="menu-enlace" th:classappend="${activo == 'destinos'} ? 'activo'" th:href="@{/destinos}">
+                <th:block th:replace="~{fragmentos/iconos :: ubicacion}"></th:block><span>Destinos</span>
+            </a>
+            <a class="menu-enlace" th:classappend="${activo == 'rutas'} ? 'activo'" th:href="@{/rutas}">
+                <th:block th:replace="~{fragmentos/iconos :: ruta}"></th:block><span>Rutas</span>
+            </a>
+            <a class="menu-enlace" th:classappend="${activo == 'usuarios'} ? 'activo'" th:href="@{/usuarios}">
+                <th:block th:replace="~{fragmentos/iconos :: escudo}"></th:block><span>Usuarios</span>
+            </a>
+        </div>
+    </nav>
+</aside>
+
+<header class="barra-superior" th:fragment="encabezado(titulo)">
+    <h1 th:text="${titulo}">Título</h1>
+    <div class="barra-datos">
+        <span class="fecha-actual" th:text="${#temporals.format(hoy, 'EEEE d ''de'' MMMM ''de'' yyyy')}">fecha</span>
+        <div class="usuario-sesion" sec:authorize="isAuthenticated()">
+            <span class="usuario-inicial" sec:authentication="principal.inicial">A</span>
+            <span class="usuario-datos">
+                <strong sec:authentication="principal.nombreCompleto">Usuario</strong>
+                <small sec:authentication="principal.etiquetaRol">Rol</small>
+            </span>
+            <form th:action="@{/logout}" method="post">
+                <button class="boton boton-secundario boton-chico" type="submit">Cerrar sesión</button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<div th:fragment="mensajes">
+    <div class="alerta alerta-exito" th:if="${mensajeExito}" th:text="${mensajeExito}" role="status"></div>
+    <div class="alerta alerta-error" th:if="${mensajeError}" th:text="${mensajeError}" role="alert"></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav class="paginacion" th:fragment="paginacion(pagina, ruta, parametros)" th:if="${pagina.totalPages > 1}"
+     th:with="actual=${pagina.number},
+              inicio=${pagina.number > 2 ? pagina.number - 2 : 0},
+              fin=${pagina.number + 2 < pagina.totalPages ? pagina.number + 2 : pagina.totalPages - 1}"
+     aria-label="Paginación">
+    <span class="paginacion-info"
+          th:text="${'Página ' + (actual + 1) + ' de ' + pagina.totalPages + ' · ' + pagina.totalElements + ' registros'}"></span>
+    <div class="paginacion-enlaces">
+        <a class="pagina-enlace" th:if="${pagina.hasPrevious()}" th:href="@{${ruta + '?pagina=' + (actual - 1) + parametros}}">Anterior</a>
+        <span class="pagina-enlace inactivo" th:unless="${pagina.hasPrevious()}">Anterior</span>
+        <th:block th:each="n : ${#numbers.sequence(inicio, fin)}">
+            <span class="pagina-enlace actual" th:if="${n == actual}" th:text="${n + 1}"></span>
+            <a class="pagina-enlace" th:unless="${n == actual}" th:href="@{${ruta + '?pagina=' + n + parametros}}" th:text="${n + 1}"></a>
+        </th:block>
+        <a class="pagina-enlace" th:if="${pagina.hasNext()}" th:href="@{${ruta + '?pagina=' + (actual + 1) + parametros}}">Siguiente</a>
+        <span class="pagina-enlace inactivo" th:unless="${pagina.hasNext()}">Siguiente</span>
+    </div>
+</nav>
+</body>
+</html>

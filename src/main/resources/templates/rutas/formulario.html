@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Ruta')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('rutas')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado(${ruta.id == null ? 'Nueva ruta' : 'Editar ruta'})}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <form class="panel formulario" method="post" th:object="${ruta}"
+              th:action="${ruta.id == null} ? @{/rutas} : @{/rutas/{id}(id=${ruta.id})}">
+            <div class="alerta alerta-error" th:if="${#fields.hasGlobalErrors()}">
+                <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+            </div>
+
+            <div class="rejilla-2">
+                <div class="campo" th:classappend="${#fields.hasErrors('idOrigen')} ? 'con-error'">
+                    <label for="origen.id">Origen</label>
+                    <select th:field="*{origen.id}" required>
+                        <option value="">Seleccione el origen</option>
+                        <option th:each="d : ${destinos}" th:value="${d.id}" th:text="${d.nombre}"></option>
+                    </select>
+                    <span class="error-campo" th:if="${#fields.hasErrors('idOrigen')}" th:errors="*{idOrigen}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('idDestino')} ? 'con-error'">
+                    <label for="destino.id">Destino</label>
+                    <select th:field="*{destino.id}" required>
+                        <option value="">Seleccione el destino</option>
+                        <option th:each="d : ${destinos}" th:value="${d.id}" th:text="${d.nombre}"></option>
+                    </select>
+                    <span class="error-campo" th:if="${#fields.hasErrors('idDestino')}" th:errors="*{idDestino}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('distanciaKm')} ? 'con-error'">
+                    <label for="distanciaKm">Distancia (km)</label>
+                    <input type="number" th:field="*{distanciaKm}" min="1" max="3000" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('distanciaKm')}" th:errors="*{distanciaKm}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('duracionHoras')} ? 'con-error'">
+                    <label for="duracionHoras">Duración (horas)</label>
+                    <input type="number" th:field="*{duracionHoras}" min="0.5" max="48" step="0.1" required>
+                    <span class="ayuda">Se usa para calcular la hora de llegada de cada viaje.</span>
+                    <span class="error-campo" th:if="${#fields.hasErrors('duracionHoras')}" th:errors="*{duracionHoras}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('precioBase')} ? 'con-error'">
+                    <label for="precioBase">Precio base (S/)</label>
+                    <input type="number" th:field="*{precioBase}" min="1" max="9999.99" step="0.01" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('precioBase')}" th:errors="*{precioBase}"></span>
+                </div>
+                <div class="campo">
+                    <label class="opcion-marcada"><input type="checkbox" th:field="*{activa}"> Ruta activa (disponible para programar viajes)</label>
+                </div>
+            </div>
+
+            <div class="acciones-formulario">
+                <button class="boton boton-primario" type="submit">Guardar</button>
+                <a class="boton boton-secundario" th:href="@{/rutas}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Reservas')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('reservas')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Reservas')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Reservas registradas</h2>
+                    <p th:text="${pagina.totalElements + ' reservas encontradas'}"></p>
+                </div>
+                <a class="boton boton-dorado" th:href="@{/reservas/viajes}">
+                    <th:block th:replace="~{fragmentos/iconos :: pasaje}"></th:block>Elegir viaje y asiento
+                </a>
+            </div>
+
+            <form class="filtros" method="get" th:action="@{/reservas}">
+                <div class="campo">
+                    <label for="dni">DNI del pasajero</label>
+                    <input type="text" id="dni" name="dni" th:value="${dni}" maxlength="8" inputmode="numeric" placeholder="Ej. 45218790">
+                </div>
+                <div class="campo">
+                    <label for="estado">Estado</label>
+                    <select id="estado" name="estado">
+                        <option value="">Todos</option>
+                        <option th:each="e : ${estados}" th:value="${e.name()}" th:text="${e.etiqueta}" th:selected="${estado == e}"></option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="rutaId">Ruta</label>
+                    <select id="rutaId" name="rutaId">
+                        <option value="">Todas</option>
+                        <option th:each="r : ${rutas}" th:value="${r.id}" th:text="${r.descripcion}" th:selected="${rutaId != null and rutaId == r.id}"></option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="desde">Reservada desde</label>
+                    <input type="date" id="desde" name="desde" th:value="${desde}">
+                </div>
+                <div class="campo">
+                    <label for="hasta">Reservada hasta</label>
+                    <input type="date" id="hasta" name="hasta" th:value="${hasta}">
+                </div>
+                <div class="filtros-acciones">
+                    <button class="boton boton-primario" type="submit">Buscar</button>
+                    <a class="boton boton-secundario" th:href="@{/reservas}">Limpiar</a>
+                </div>
+            </form>
+
+            <div class="contenedor-tabla" th:if="${!pagina.empty}">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>N.°</th><th>Fecha</th><th>Pasajero</th><th>Viaje</th><th class="centro">Asiento</th><th>Estado</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${pagina.content}">
+                            <td th:text="${r.id}"></td>
+                            <td th:text="${#temporals.format(r.fechaReserva, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td>
+                                <strong th:text="${r.pasajero.nombreCompleto}"></strong><br>
+                                <small th:text="${'DNI ' + r.pasajero.dni}"></small>
+                            </td>
+                            <td>
+                                <span th:text="${r.viaje.ruta.descripcion}"></span><br>
+                                <small th:text="${#temporals.format(r.viaje.fechaSalida, 'dd/MM/yyyy HH:mm')}"></small>
+                            </td>
+                            <td class="centro" th:text="${r.asiento.numero}"></td>
+                            <td><span class="etiqueta" th:classappend="${'estado-' + r.estado.name().toLowerCase()}" th:text="${r.estado.etiqueta}"></span></td>
+                            <td><a class="boton boton-secundario boton-chico" th:href="@{/reservas/{id}(id=${r.id})}">Ver detalle</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="vacio" th:if="${pagina.empty}">No se encontraron reservas con los datos indicados.</p>
+            <div th:replace="~{fragmentos/paginacion :: paginacion(${pagina}, '/reservas', ${parametros})}"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

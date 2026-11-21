@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Conductor')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('conductores')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado(${conductor.id == null ? 'Nuevo conductor' : 'Editar conductor'})}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <form class="panel formulario" method="post" th:object="${conductor}"
+              th:action="${conductor.id == null} ? @{/conductores} : @{/conductores/{id}(id=${conductor.id})}">
+            <div class="alerta alerta-error" th:if="${#fields.hasGlobalErrors()}">
+                <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+            </div>
+
+            <div class="rejilla-2">
+                <div class="campo" th:classappend="${#fields.hasErrors('dni')} ? 'con-error'">
+                    <label for="dni">DNI</label>
+                    <input type="text" th:field="*{dni}" maxlength="8" inputmode="numeric" pattern="\d{8}"
+                           title="Ingrese los 8 dígitos del DNI" placeholder="8 dígitos" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('licencia')} ? 'con-error'">
+                    <label for="licencia">Licencia de conducir</label>
+                    <input type="text" th:field="*{licencia}" maxlength="9" pattern="[A-Za-z]\d{8}"
+                           title="Una letra seguida de 8 dígitos" placeholder="Q12345678" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('licencia')}" th:errors="*{licencia}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('nombres')} ? 'con-error'">
+                    <label for="nombres">Nombres</label>
+                    <input type="text" th:field="*{nombres}" maxlength="80" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('apellidos')} ? 'con-error'">
+                    <label for="apellidos">Apellidos</label>
+                    <input type="text" th:field="*{apellidos}" maxlength="80" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('categoriaLicencia')} ? 'con-error'">
+                    <label for="categoriaLicencia">Categoría de la licencia</label>
+                    <select th:field="*{categoriaLicencia}" required>
+                        <option value="">Seleccione una categoría</option>
+                        <option th:each="categoria : ${categorias}" th:value="${categoria}" th:text="${categoria}"></option>
+                    </select>
+                    <span class="error-campo" th:if="${#fields.hasErrors('categoriaLicencia')}" th:errors="*{categoriaLicencia}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('telefono')} ? 'con-error'">
+                    <label for="telefono">Teléfono celular</label>
+                    <input type="text" th:field="*{telefono}" maxlength="9" inputmode="numeric" pattern="9\d{8}"
+                           title="Ingrese 9 dígitos que empiecen con 9" placeholder="9XXXXXXXX">
+                    <span class="error-campo" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></span>
+                </div>
+                <div class="campo ancho-completo">
+                    <label class="opcion-marcada"><input type="checkbox" th:field="*{activo}"> Conductor activo (disponible para asignar a viajes)</label>
+                </div>
+            </div>
+
+            <div class="acciones-formulario">
+                <button class="boton boton-primario" type="submit">Guardar</button>
+                <a class="boton boton-secundario" th:href="@{/conductores}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

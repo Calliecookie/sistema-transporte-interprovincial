@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Reservar o vender')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('venta')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Reservar o vender un pasaje')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <div class="alerta alerta-error" th:if="${asiento == null}">
+            No se pudo identificar el asiento seleccionado. Regrese a la lista de viajes y elíjalo nuevamente.
+        </div>
+
+        <div class="disposicion-dos" th:if="${asiento != null}">
+            <form class="panel formulario" method="post" th:object="${formulario}" th:action="@{/reservas}">
+                <input type="hidden" th:field="*{viajeId}">
+                <input type="hidden" th:field="*{asientoId}">
+
+                <div class="alerta alerta-error" th:if="${#fields.hasGlobalErrors()}">
+                    <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+                </div>
+                <div class="alerta alerta-error" th:if="${#fields.hasErrors('viajeId') or #fields.hasErrors('asientoId')}">
+                    <p th:each="error : ${#fields.errors('viajeId')}" th:text="${error}"></p>
+                    <p th:each="error : ${#fields.errors('asientoId')}" th:text="${error}"></p>
+                </div>
+
+                <div class="rejilla-2">
+                    <div class="campo ancho-completo" th:classappend="${#fields.hasErrors('dni')} ? 'con-error'">
+                        <label for="dni">DNI del pasajero</label>
+                        <input type="text" th:field="*{dni}" maxlength="8" inputmode="numeric" pattern="\d{8}"
+                               title="Ingrese los 8 dígitos del DNI" placeholder="8 dígitos" required autofocus>
+                        <span class="ayuda">¿El pasajero no está registrado? <a th:href="@{/pasajeros/nuevo}">Registrarlo ahora</a>.</span>
+                        <span class="error-campo" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></span>
+                    </div>
+
+                    <div class="campo ancho-completo" th:classappend="${#fields.hasErrors('accion')} ? 'con-error'">
+                        <span class="etiqueta-campo">¿Qué desea hacer?</span>
+                        <div class="opciones-radio">
+                            <label class="opcion-radio" th:each="a : ${acciones}">
+                                <input type="radio" name="accion" th:value="${a.name()}" th:checked="${formulario.accion == a}">
+                                <span th:text="${a.etiqueta}"></span>
+                            </label>
+                        </div>
+                        <span class="error-campo" th:if="${#fields.hasErrors('accion')}" th:errors="*{accion}"></span>
+                    </div>
+
+                    <div class="campo ancho-completo" id="bloque-pago" th:classappend="${#fields.hasErrors('metodoPago')} ? 'con-error'">
+                        <label for="metodoPago">Método de pago</label>
+                        <select th:field="*{metodoPago}">
+                            <option value="">Seleccione el método de pago</option>
+                            <option th:each="m : ${metodosPago}" th:value="${m.name()}" th:text="${m.etiqueta}"></option>
+                        </select>
+                        <span class="error-campo" th:if="${#fields.hasErrors('metodoPago')}" th:errors="*{metodoPago}"></span>
+                    </div>
+                </div>
+
+                <div class="acciones-formulario">
+                    <button class="boton boton-primario" type="submit">Confirmar</button>
+                    <a class="boton boton-secundario" th:href="@{/reservas/viajes/{id}(id=${formulario.viajeId})}">Volver al mapa de asientos</a>
+                </div>
+            </form>
+
+            <aside class="panel">
+                <div class="panel-cabecera"><h2>Resumen del viaje</h2></div>
+                <dl class="datos">
+                    <div><dt>Ruta</dt><dd th:text="${viaje.ruta.descripcion}"></dd></div>
+                    <div><dt>Salida</dt><dd th:text="${#temporals.format(viaje.fechaSalida, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                    <div><dt>Bus</dt><dd th:text="${viaje.bus.placa}"></dd></div>
+                    <div><dt>Asiento</dt><dd th:text="${asiento.numero}"></dd></div>
+                    <div><dt>Precio</dt><dd th:text="${'S/ ' + #numbers.formatDecimal(viaje.precio, 1, 'COMMA', 2, 'POINT')}"></dd></div>
+                </dl>
+            </aside>
+        </div>
+    </main>
+</div>
+</body>
+</html>

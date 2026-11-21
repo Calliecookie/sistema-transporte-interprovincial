@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Vender pasajes')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('venta')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Vender pasajes')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Viajes con asientos disponibles</h2>
+                    <p th:text="${pagina.totalElements + ' salidas programadas'}"></p>
+                </div>
+            </div>
+
+            <form class="filtros" method="get" th:action="@{/reservas/viajes}">
+                <div class="campo">
+                    <label for="fecha">Fecha de salida</label>
+                    <input type="date" id="fecha" name="fecha" th:value="${fecha}">
+                </div>
+                <div class="campo">
+                    <label for="rutaId">Ruta</label>
+                    <select id="rutaId" name="rutaId">
+                        <option value="">Todas</option>
+                        <option th:each="r : ${rutas}" th:value="${r.id}" th:text="${r.descripcion}" th:selected="${rutaId != null and rutaId == r.id}"></option>
+                    </select>
+                </div>
+                <div class="filtros-acciones">
+                    <button class="boton boton-primario" type="submit">Buscar</button>
+                    <a class="boton boton-secundario" th:href="@{/reservas/viajes}">Limpiar</a>
+                </div>
+            </form>
+
+            <div class="contenedor-tabla" th:if="${!pagina.empty}">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Ruta</th><th>Salida</th><th>Llegada</th><th>Bus</th><th class="derecha">Precio</th><th class="centro">Asientos libres</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="v : ${pagina.content}">
+                            <td><strong th:text="${v.ruta.descripcion}"></strong></td>
+                            <td th:text="${#temporals.format(v.fechaSalida, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="${#temporals.format(v.fechaLlegada, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="${v.bus.placa}"></td>
+                            <td class="derecha" th:text="${'S/ ' + #numbers.formatDecimal(v.precio, 1, 'COMMA', 2, 'POINT')}"></td>
+                            <td class="centro" th:text="${v.asientosLibres + ' de ' + v.asientosTotales}"></td>
+                            <td><a class="boton boton-dorado boton-chico" th:href="@{/reservas/viajes/{id}(id=${v.id})}">Elegir asiento</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="vacio" th:if="${pagina.empty}">No hay viajes programados con los datos indicados.</p>
+            <div th:replace="~{fragmentos/paginacion :: paginacion(${pagina}, '/reservas/viajes', ${parametros})}"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

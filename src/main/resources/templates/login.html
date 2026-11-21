@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Iniciar sesión')}"></head>
+<body class="cuerpo-acceso">
+<main class="acceso">
+    <section class="acceso-panel">
+        <div class="acceso-panel-contenido">
+            <span class="marca-simbolo"><th:block th:replace="~{fragmentos/iconos :: montanas}"></th:block></span>
+            <h2>Transportes Andinos</h2>
+            <p>Sistema de gestión de viajes interprovinciales: rutas, buses, conductores, reservas y venta de pasajes.</p>
+            <ul class="acceso-lista">
+                <li>Lima</li><li>Arequipa</li><li>Cusco</li><li>Trujillo</li><li>Piura</li><li>Chiclayo</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="acceso-formulario">
+        <form class="acceso-tarjeta" method="post" th:action="@{/login}">
+            <h1>Iniciar sesión</h1>
+            <p class="ayuda">Ingrese con su usuario y contraseña para continuar.</p>
+
+            <div class="alerta alerta-error" th:if="${param.error}" role="alert">
+                Usuario o contraseña incorrectos. Si el problema continúa, consulte con el administrador.
+            </div>
+            <div class="alerta alerta-error" th:if="${param.vencida}" role="alert">
+                Su sesión ya no es válida porque su cuenta cambió. Inicie sesión nuevamente.
+            </div>
+            <div class="alerta alerta-exito" th:if="${param.salir}" role="status">
+                Cerró su sesión correctamente.
+            </div>
+
+            <div class="campo">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" name="username" autocomplete="username" autofocus required>
+            </div>
+            <div class="campo">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" autocomplete="current-password" required>
+            </div>
+            <button class="boton boton-primario boton-ancho" type="submit">Ingresar</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

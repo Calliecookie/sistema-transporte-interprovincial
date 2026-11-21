@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Viaje')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('viajes')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado(${viaje.id == null ? 'Programar viaje' : 'Editar viaje'})}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <form class="panel formulario" method="post" th:object="${viaje}"
+              th:action="${viaje.id == null} ? @{/viajes} : @{/viajes/{id}(id=${viaje.id})}">
+            <div class="alerta alerta-error" th:if="${#fields.hasGlobalErrors()}">
+                <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+            </div>
+
+            <div class="rejilla-2">
+                <div class="campo ancho-completo" th:classappend="${#fields.hasErrors('idRuta')} ? 'con-error'">
+                    <label for="ruta.id">Ruta</label>
+                    <select th:field="*{ruta.id}" data-precio-objetivo="precio" required>
+                        <option value="">Seleccione la ruta</option>
+                        <option th:each="r : ${rutas}" th:value="${r.id}" th:data-precio="${r.precioBase}"
+                                th:text="${r.descripcion + ' (' + r.duracionHoras + ' h)'}"></option>
+                    </select>
+                    <span class="error-campo" th:if="${#fields.hasErrors('idRuta')}" th:errors="*{idRuta}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('idBus')} ? 'con-error'">
+                    <label for="bus.id">Bus</label>
+                    <select th:field="*{bus.id}" required>
+                        <option value="">Seleccione el bus</option>
+                        <option th:each="b : ${buses}" th:value="${b.id}" th:text="${b.descripcion}"></option>
+                    </select>
+                    <span class="error-campo" th:if="${#fields.hasErrors('idBus')}" th:errors="*{idBus}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('idConductor')} ? 'con-error'">
+                    <label for="conductor.id">Conductor</label>
+                    <select th:field="*{conductor.id}" required>
+                        <option value="">Seleccione el conductor</option>
+                        <option th:each="c : ${conductores}" th:value="${c.id}" th:text="${c.nombreCompleto + ' (' + c.categoriaLicencia + ')'}"></option>
+                    </select>
+                    <span class="error-campo" th:if="${#fields.hasErrors('idConductor')}" th:errors="*{idConductor}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('fechaSalida')} ? 'con-error'">
+                    <label for="fechaSalida">Fecha y hora de salida</label>
+                    <input type="datetime-local" th:field="*{fechaSalida}" required>
+                    <span class="ayuda">La llegada se calcula con la duración de la ruta.</span>
+                    <span class="error-campo" th:if="${#fields.hasErrors('fechaSalida')}" th:errors="*{fechaSalida}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('precio')} ? 'con-error'">
+                    <label for="precio">Precio del pasaje (S/)</label>
+                    <input type="number" th:field="*{precio}" min="1" max="9999.99" step="0.01" required>
+                    <span class="ayuda">Se propone el precio base de la ruta; puede modificarlo.</span>
+                    <span class="error-campo" th:if="${#fields.hasErrors('precio')}" th:errors="*{precio}"></span>
+                </div>
+            </div>
+
+            <div class="acciones-formulario">
+                <button class="boton boton-primario" type="submit">Guardar viaje</button>
+                <a class="boton boton-secundario" th:href="${viaje.id == null} ? @{/viajes} : @{/viajes/{id}(id=${viaje.id})}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

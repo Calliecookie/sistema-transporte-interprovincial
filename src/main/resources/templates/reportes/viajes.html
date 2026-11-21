@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Reporte de viajes')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('reportes')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Reporte de viajes')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="tarjetas">
+            <article class="tarjeta-resumen">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: calendario}"></th:block></span>
+                <div><span class="tarjeta-valor" th:text="${resumen.viajes()}">0</span><span class="tarjeta-titulo">Viajes en el reporte</span></div>
+            </article>
+            <article class="tarjeta-resumen">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: pasaje}"></th:block></span>
+                <div><span class="tarjeta-valor" th:text="${resumen.pasajesVendidos()}">0</span><span class="tarjeta-titulo">Asientos vendidos</span></div>
+            </article>
+            <article class="tarjeta-resumen">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: reserva}"></th:block></span>
+                <div><span class="tarjeta-valor" th:text="${resumen.asientosReservados()}">0</span><span class="tarjeta-titulo">Asientos reservados</span></div>
+            </article>
+            <article class="tarjeta-resumen">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: dinero}"></th:block></span>
+                <div><span class="tarjeta-valor" th:text="${'S/ ' + #numbers.formatDecimal(resumen.ingresos(), 1, 'COMMA', 2, 'POINT')}">S/ 0.00</span><span class="tarjeta-titulo">Ingresos por pasajes</span></div>
+            </article>
+        </section>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Viajes y ocupación</h2>
+                    <p th:text="${pagina.totalElements + ' viajes encontrados'}"></p>
+                </div>
+                <a class="boton boton-dorado" th:href="@{${'/reportes/viajes/csv?' + (parametros.isEmpty() ? '' : parametros.substring(1))}}">
+                    <th:block th:replace="~{fragmentos/iconos :: descarga}"></th:block>Exportar a CSV
+                </a>
+            </div>
+
+            <form class="filtros" method="get" th:action="@{/reportes/viajes}">
+                <div class="campo">
+                    <label for="desde">Salida desde</label>
+                    <input type="date" id="desde" name="desde" th:value="${desde}">
+                </div>
+                <div class="campo">
+                    <label for="hasta">Salida hasta</label>
+                    <input type="date" id="hasta" name="hasta" th:value="${hasta}">
+                </div>
+                <div class="campo">
+                    <label for="rutaId">Ruta</label>
+                    <select id="rutaId" name="rutaId">
+                        <option value="">Todas</option>
+                        <option th:each="r : ${rutas}" th:value="${r.id}" th:text="${r.descripcion}" th:selected="${rutaId != null and rutaId == r.id}"></option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="estado">Estado</label>
+                    <select id="estado" name="estado">
+                        <option value="">Todos</option>
+                        <option th:each="e : ${estados}" th:value="${e.name()}" th:text="${e.etiqueta}" th:selected="${estado == e}"></option>
+                    </select>
+                </div>
+                <div class="filtros-acciones">
+                    <button class="boton boton-primario" type="submit">Generar</button>
+                    <a class="boton boton-secundario" th:href="@{/reportes/viajes}">Limpiar</a>
+                </div>
+            </form>
+
+            <div class="contenedor-tabla" th:if="${!pagina.empty}">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>N.°</th><th>Ruta</th><th>Salida</th><th>Bus</th><th>Estado</th><th class="centro">Vendidos</th><th class="centro">Reservados</th><th class="centro">Libres</th><th class="derecha">Ingresos</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="fila : ${pagina.content}">
+                            <td th:text="${fila.viaje().id}"></td>
+                            <td><strong th:text="${fila.viaje().ruta.descripcion}"></strong></td>
+                            <td th:text="${#temporals.format(fila.viaje().fechaSalida, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="${fila.viaje().bus.placa}"></td>
+                            <td><span class="etiqueta" th:classappend="${'estado-' + fila.viaje().estado.name().toLowerCase()}" th:text="${fila.viaje().estado.etiqueta}"></span></td>
+                            <td class="centro" th:text="${fila.vendidos()}"></td>
+                            <td class="centro" th:text="${fila.reservados()}"></td>
+                            <td class="centro" th:text="${fila.libres()}"></td>
+                            <td class="derecha" th:text="${'S/ ' + #numbers.formatDecimal(fila.ingresos(), 1, 'COMMA', 2, 'POINT')}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="vacio" th:if="${pagina.empty}">No hay viajes que coincidan con los filtros.</p>
+            <div th:replace="~{fragmentos/paginacion :: paginacion(${pagina}, '/reportes/viajes', ${parametros})}"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

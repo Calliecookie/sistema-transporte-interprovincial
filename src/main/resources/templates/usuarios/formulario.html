@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Usuario')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('usuarios')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado(${usuarioId == null ? 'Nuevo usuario' : 'Editar usuario'})}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <form class="panel formulario" method="post" th:object="${formulario}"
+              th:action="${usuarioId == null} ? @{/usuarios} : @{/usuarios/{id}(id=${usuarioId})}">
+            <div class="alerta alerta-error" th:if="${#fields.hasGlobalErrors()}">
+                <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+            </div>
+
+            <div class="rejilla-2">
+                <div class="campo" th:classappend="${#fields.hasErrors('nombreUsuario')} ? 'con-error'">
+                    <label for="nombreUsuario">Nombre de usuario</label>
+                    <input type="text" th:field="*{nombreUsuario}" maxlength="40" autocomplete="off" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('nombreUsuario')}" th:errors="*{nombreUsuario}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('nombreCompleto')} ? 'con-error'">
+                    <label for="nombreCompleto">Nombre completo</label>
+                    <input type="text" th:field="*{nombreCompleto}" maxlength="100" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('nombreCompleto')}" th:errors="*{nombreCompleto}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('rol')} ? 'con-error'">
+                    <label for="rol">Rol</label>
+                    <select th:field="*{rol}" required>
+                        <option value="">Seleccione un rol</option>
+                        <option th:each="r : ${roles}" th:value="${r.name()}" th:text="${r.etiqueta}"></option>
+                    </select>
+                    <span class="error-campo" th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}"></span>
+                </div>
+                <div class="campo">
+                    <label class="opcion-marcada"><input type="checkbox" th:field="*{activo}"> Usuario activo (puede iniciar sesión)</label>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('contrasena')} ? 'con-error'">
+                    <label for="contrasena" th:text="${usuarioId == null} ? 'Contraseña' : 'Nueva contraseña'">Contraseña</label>
+                    <input type="password" th:field="*{contrasena}" maxlength="72" autocomplete="new-password" th:required="${usuarioId == null}">
+                    <span class="ayuda" th:if="${usuarioId != null}">Déjela en blanco para conservar la contraseña actual.</span>
+                    <span class="error-campo" th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('confirmacion')} ? 'con-error'">
+                    <label for="confirmacion">Confirmar contraseña</label>
+                    <input type="password" th:field="*{confirmacion}" maxlength="72" autocomplete="new-password" th:required="${usuarioId == null}">
+                    <span class="error-campo" th:if="${#fields.hasErrors('confirmacion')}" th:errors="*{confirmacion}"></span>
+                </div>
+            </div>
+
+            <div class="acciones-formulario">
+                <button class="boton boton-primario" type="submit">Guardar</button>
+                <a class="boton boton-secundario" th:href="@{/usuarios}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

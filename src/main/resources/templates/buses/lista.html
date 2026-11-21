@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Buses')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('buses')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Buses')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Flota de buses</h2>
+                    <p th:text="${pagina.totalElements + ' buses encontrados'}"></p>
+                </div>
+                <a class="boton boton-dorado" th:href="@{/buses/nuevo}">
+                    <th:block th:replace="~{fragmentos/iconos :: mas}"></th:block>Nuevo bus
+                </a>
+            </div>
+
+            <form class="filtros" method="get" th:action="@{/buses}">
+                <div class="campo">
+                    <label for="texto">Placa, marca o modelo</label>
+                    <input type="text" id="texto" name="texto" th:value="${texto}" placeholder="Buscar bus">
+                </div>
+                <div class="campo">
+                    <label for="activo">Estado</label>
+                    <select id="activo" name="activo">
+                        <option value="">Todos</option>
+                        <option value="true" th:selected="${activo != null and activo == true}">Activos</option>
+                        <option value="false" th:selected="${activo != null and activo == false}">Inactivos</option>
+                    </select>
+                </div>
+                <div class="filtros-acciones">
+                    <button class="boton boton-primario" type="submit">Buscar</button>
+                    <a class="boton boton-secundario" th:href="@{/buses}">Limpiar</a>
+                </div>
+            </form>
+
+            <div class="contenedor-tabla" th:if="${!pagina.empty}">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Placa</th><th>Marca</th><th>Modelo</th><th class="centro">Capacidad</th><th class="centro">Año</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="b : ${pagina.content}">
+                            <td><strong th:text="${b.placa}"></strong></td>
+                            <td th:text="${b.marca}"></td>
+                            <td th:text="${b.modelo}"></td>
+                            <td class="centro" th:text="${b.capacidad + ' asientos'}"></td>
+                            <td class="centro" th:text="${b.anioFabricacion}"></td>
+                            <td><span class="etiqueta" th:classappend="${b.activo} ? 'estado-activo' : 'estado-inactivo'" th:text="${b.activo} ? 'Activo' : 'Inactivo'"></span></td>
+                            <td>
+                                <div class="acciones">
+                                    <a class="boton boton-secundario boton-chico" th:href="@{/buses/{id}/editar(id=${b.id})}">Editar</a>
+                                    <form th:action="@{/buses/{id}/eliminar(id=${b.id})}" method="post"
+                                          th:data-confirmar="${'¿Eliminar el bus ' + b.placa + '?'}">
+                                        <button class="boton boton-peligro boton-chico" type="submit">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="vacio" th:if="${pagina.empty}">No se encontraron buses con los datos indicados.</p>
+            <div th:replace="~{fragmentos/paginacion :: paginacion(${pagina}, '/buses', ${parametros})}"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

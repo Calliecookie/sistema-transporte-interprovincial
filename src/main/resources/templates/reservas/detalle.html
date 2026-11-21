@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Detalle de la reserva')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('reservas')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Detalle de la reserva')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2 th:text="${'Reserva N.° ' + reserva.id}"></h2>
+                    <p th:text="${'Registrada el ' + #temporals.format(reserva.fechaReserva, 'dd/MM/yyyy HH:mm')}"></p>
+                </div>
+                <div class="acciones">
+                    <a class="boton boton-secundario" th:href="@{/reservas/viajes/{id}(id=${reserva.viaje.id})}">
+                        <th:block th:replace="~{fragmentos/iconos :: volver}"></th:block>Mapa de asientos
+                    </a>
+                    <a class="boton boton-secundario" th:if="${pasaje != null}" th:href="@{/pasajes/{id}(id=${pasaje.id})}">
+                        <th:block th:replace="~{fragmentos/iconos :: pasaje}"></th:block>Ver pasaje
+                    </a>
+                    <form th:if="${reserva.estado.name() != 'ANULADA' and reserva.viaje.estado.name() == 'PROGRAMADO'}"
+                          th:action="@{/reservas/{id}/anular(id=${reserva.id})}" method="post"
+                          data-confirmar="¿Anular la reserva? El asiento quedará libre.">
+                        <button class="boton boton-peligro" type="submit">Anular reserva</button>
+                    </form>
+                </div>
+            </div>
+            <dl class="datos">
+                <div><dt>Estado</dt><dd><span class="etiqueta" th:classappend="${'estado-' + reserva.estado.name().toLowerCase()}" th:text="${reserva.estado.etiqueta}"></span></dd></div>
+                <div><dt>Pasajero</dt><dd th:text="${reserva.pasajero.nombreCompleto}"></dd></div>
+                <div><dt>DNI</dt><dd th:text="${reserva.pasajero.dni}"></dd></div>
+                <div><dt>Asiento</dt><dd th:text="${reserva.asiento.numero}"></dd></div>
+                <div><dt>Ruta</dt><dd th:text="${reserva.viaje.ruta.descripcion}"></dd></div>
+                <div><dt>Salida</dt><dd th:text="${#temporals.format(reserva.viaje.fechaSalida, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                <div><dt>Precio</dt><dd th:text="${'S/ ' + #numbers.formatDecimal(reserva.viaje.precio, 1, 'COMMA', 2, 'POINT')}"></dd></div>
+                <div th:if="${reserva.usuario != null}"><dt>Registrada por</dt><dd th:text="${reserva.usuario.nombreCompleto}"></dd></div>
+            </dl>
+        </section>
+
+        <section class="panel formulario" th:if="${reserva.estado.name() == 'RESERVADA' and ventaAbierta}">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Vender el pasaje</h2>
+                    <p>Confirme el pago para convertir la reserva en un pasaje emitido.</p>
+                </div>
+            </div>
+            <form th:action="@{/reservas/{id}/vender(id=${reserva.id})}" method="post">
+                <div class="rejilla-2">
+                    <div class="campo">
+                        <label for="metodoPago">Método de pago</label>
+                        <select id="metodoPago" name="metodoPago" required>
+                            <option value="">Seleccione el método de pago</option>
+                            <option th:each="m : ${metodosPago}" th:value="${m.name()}" th:text="${m.etiqueta}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="acciones-formulario">
+                    <button class="boton boton-primario" type="submit">Confirmar venta</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>

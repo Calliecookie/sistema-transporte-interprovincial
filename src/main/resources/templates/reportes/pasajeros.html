@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Reporte de pasajeros')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('reportes')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Reporte de pasajeros')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Pasajeros por viaje</h2>
+                    <p th:text="${pagina.totalElements + ' registros encontrados'}"></p>
+                </div>
+                <a class="boton boton-dorado" th:href="@{${'/reportes/pasajeros/csv?' + (parametros.isEmpty() ? '' : parametros.substring(1))}}">
+                    <th:block th:replace="~{fragmentos/iconos :: descarga}"></th:block>Exportar a CSV
+                </a>
+            </div>
+
+            <form class="filtros" method="get" th:action="@{/reportes/pasajeros}">
+                <div class="campo">
+                    <label for="dni">DNI del pasajero</label>
+                    <input type="text" id="dni" name="dni" th:value="${dni}" maxlength="8" inputmode="numeric" placeholder="Ej. 45218790">
+                </div>
+                <div class="campo">
+                    <label for="desde">Viaje desde</label>
+                    <input type="date" id="desde" name="desde" th:value="${desde}">
+                </div>
+                <div class="campo">
+                    <label for="hasta">Viaje hasta</label>
+                    <input type="date" id="hasta" name="hasta" th:value="${hasta}">
+                </div>
+                <div class="campo">
+                    <label for="rutaId">Ruta</label>
+                    <select id="rutaId" name="rutaId">
+                        <option value="">Todas</option>
+                        <option th:each="r : ${rutas}" th:value="${r.id}" th:text="${r.descripcion}" th:selected="${rutaId != null and rutaId == r.id}"></option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="estado">Estado de la reserva</label>
+                    <select id="estado" name="estado">
+                        <option value="">Todos</option>
+                        <option th:each="e : ${estados}" th:value="${e.name()}" th:text="${e.etiqueta}" th:selected="${estado == e}"></option>
+                    </select>
+                </div>
+                <div class="filtros-acciones">
+                    <button class="boton boton-primario" type="submit">Generar</button>
+                    <a class="boton boton-secundario" th:href="@{/reportes/pasajeros}">Limpiar</a>
+                </div>
+            </form>
+
+            <div class="contenedor-tabla" th:if="${!pagina.empty}">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>DNI</th><th>Pasajero</th><th>Ruta</th><th>Salida</th><th class="centro">Asiento</th><th>Reserva</th><th>Pasaje</th><th class="derecha">Monto</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="fila : ${pagina.content}">
+                            <td th:text="${fila.reserva().pasajero.dni}"></td>
+                            <td th:text="${fila.reserva().pasajero.nombreCompleto}"></td>
+                            <td th:text="${fila.reserva().viaje.ruta.descripcion}"></td>
+                            <td th:text="${#temporals.format(fila.reserva().viaje.fechaSalida, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td class="centro" th:text="${fila.reserva().asiento.numero}"></td>
+                            <td><span class="etiqueta" th:classappend="${'estado-' + fila.reserva().estado.name().toLowerCase()}" th:text="${fila.reserva().estado.etiqueta}"></span></td>
+                            <td th:text="${fila.pasaje() != null} ? ${fila.pasaje().codigo} : '—'"></td>
+                            <td class="derecha" th:text="${fila.pasaje() != null} ? ${'S/ ' + #numbers.formatDecimal(fila.pasaje().precio, 1, 'COMMA', 2, 'POINT')} : '—'"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="vacio" th:if="${pagina.empty}">No hay pasajeros que coincidan con los filtros.</p>
+            <div th:replace="~{fragmentos/paginacion :: paginacion(${pagina}, '/reportes/pasajeros', ${parametros})}"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

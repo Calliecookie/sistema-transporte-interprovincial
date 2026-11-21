@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragmentos/base :: cabecera('Inicio')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('panel')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Panel de control')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="banner-panel">
+            <h2>Gestión de viajes interprovinciales</h2>
+            <p>Consulte las próximas salidas, controle la ocupación de cada bus y registre las reservas y ventas de pasajes.</p>
+            <a class="boton boton-dorado" th:href="@{/reservas/viajes}">
+                <th:block th:replace="~{fragmentos/iconos :: pasaje}"></th:block>Vender pasajes
+            </a>
+        </section>
+
+        <section class="tarjetas">
+            <article class="tarjeta-resumen">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: usuarios}"></th:block></span>
+                <div><span class="tarjeta-valor" th:text="${resumen.pasajeros()}">0</span><span class="tarjeta-titulo">Pasajeros registrados</span></div>
+            </article>
+            <article class="tarjeta-resumen" sec:authorize="hasRole('ADMIN')">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: bus}"></th:block></span>
+                <div><span class="tarjeta-valor" th:text="${resumen.busesActivos()}">0</span><span class="tarjeta-titulo">Buses activos</span></div>
+            </article>
+            <article class="tarjeta-resumen" sec:authorize="hasRole('ADMIN')">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: volante}"></th:block></span>
+                <div><span class="tarjeta-valor" th:text="${resumen.conductoresActivos()}">0</span><span class="tarjeta-titulo">Conductores activos</span></div>
+            </article>
+            <article class="tarjeta-resumen">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: calendario}"></th:block></span>
+                <div><span class="tarjeta-valor" th:text="${resumen.viajesProgramados()}">0</span><span class="tarjeta-titulo">Viajes programados</span></div>
+            </article>
+            <article class="tarjeta-resumen">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: reserva}"></th:block></span>
+                <div><span class="tarjeta-valor" th:text="${resumen.reservasPendientes()}">0</span><span class="tarjeta-titulo">Reservas pendientes de pago</span></div>
+            </article>
+            <article class="tarjeta-resumen">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: pasaje}"></th:block></span>
+                <div><span class="tarjeta-valor" th:text="${resumen.pasajesEmitidos()}">0</span><span class="tarjeta-titulo">Pasajes emitidos</span></div>
+            </article>
+            <article class="tarjeta-resumen">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: dinero}"></th:block></span>
+                <div><span class="tarjeta-valor" th:text="${'S/ ' + #numbers.formatDecimal(resumen.ingresos(), 1, 'COMMA', 2, 'POINT')}">S/ 0.00</span><span class="tarjeta-titulo">Ingresos por pasajes</span></div>
+            </article>
+        </section>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Próximas salidas</h2>
+                    <p>Los siguientes viajes programados con su disponibilidad de asientos.</p>
+                </div>
+                <a class="boton boton-secundario" sec:authorize="hasRole('ADMIN')" th:href="@{/viajes/nuevo}">
+                    <th:block th:replace="~{fragmentos/iconos :: mas}"></th:block>Programar viaje
+                </a>
+            </div>
+            <div class="contenedor-tabla" th:if="${!proximosViajes.isEmpty()}">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Ruta</th><th>Salida</th><th>Bus</th><th>Asientos libres</th><th>Estado</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="v : ${proximosViajes}">
+                            <td th:text="${v.ruta.descripcion}"></td>
+                            <td th:text="${#temporals.format(v.fechaSalida, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="${v.bus.placa}"></td>
+                            <td th:text="${v.asientosLibres + ' de ' + v.asientosTotales}"></td>
+                            <td><span class="etiqueta" th:classappend="${'estado-' + v.estado.name().toLowerCase()}" th:text="${v.estado.etiqueta}"></span></td>
+                            <td><a class="boton boton-secundario boton-chico" th:href="@{/reservas/viajes/{id}(id=${v.id})}">Ver asientos</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="vacio" th:if="${proximosViajes.isEmpty()}">No hay viajes programados por el momento.</p>
+        </section>
+    </main>
+</div>
+</body>
+</html>

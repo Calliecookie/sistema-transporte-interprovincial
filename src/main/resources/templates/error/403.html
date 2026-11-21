@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Acceso denegado')}"></head>
+<body>
+<main class="pagina-error">
+    <div class="tarjeta-error">
+        <div class="codigo-error">403</div>
+        <h1>No tiene permiso para esta sección</h1>
+        <p>Su rol no permite ver esta página ni realizar esta operación. Si necesita acceso, solicítelo al administrador del sistema.</p>
+        <a class="boton boton-primario" th:href="@{/}">Volver al inicio</a>
+    </div>
+</main>
+</body>
+</html>

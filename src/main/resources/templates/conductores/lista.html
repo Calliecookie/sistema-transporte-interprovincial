@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Conductores')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('conductores')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Conductores')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Listado de conductores</h2>
+                    <p th:text="${pagina.totalElements + ' conductores encontrados'}"></p>
+                </div>
+                <a class="boton boton-dorado" th:href="@{/conductores/nuevo}">
+                    <th:block th:replace="~{fragmentos/iconos :: mas}"></th:block>Nuevo conductor
+                </a>
+            </div>
+
+            <form class="filtros" method="get" th:action="@{/conductores}">
+                <div class="campo">
+                    <label for="texto">DNI, nombre o licencia</label>
+                    <input type="text" id="texto" name="texto" th:value="${texto}" placeholder="Buscar conductor">
+                </div>
+                <div class="campo">
+                    <label for="activo">Estado</label>
+                    <select id="activo" name="activo">
+                        <option value="">Todos</option>
+                        <option value="true" th:selected="${activo != null and activo == true}">Activos</option>
+                        <option value="false" th:selected="${activo != null and activo == false}">Inactivos</option>
+                    </select>
+                </div>
+                <div class="filtros-acciones">
+                    <button class="boton boton-primario" type="submit">Buscar</button>
+                    <a class="boton boton-secundario" th:href="@{/conductores}">Limpiar</a>
+                </div>
+            </form>
+
+            <div class="contenedor-tabla" th:if="${!pagina.empty}">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>DNI</th><th>Conductor</th><th>Licencia</th><th>Categoría</th><th>Teléfono</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${pagina.content}">
+                            <td th:text="${c.dni}"></td>
+                            <td th:text="${c.apellidos + ', ' + c.nombres}"></td>
+                            <td th:text="${c.licencia}"></td>
+                            <td th:text="${c.categoriaLicencia}"></td>
+                            <td th:text="${c.telefono} ?: '—'"></td>
+                            <td><span class="etiqueta" th:classappend="${c.activo} ? 'estado-activo' : 'estado-inactivo'" th:text="${c.activo} ? 'Activo' : 'Inactivo'"></span></td>
+                            <td>
+                                <div class="acciones">
+                                    <a class="boton boton-secundario boton-chico" th:href="@{/conductores/{id}/editar(id=${c.id})}">Editar</a>
+                                    <form th:action="@{/conductores/{id}/eliminar(id=${c.id})}" method="post"
+                                          th:data-confirmar="${'¿Eliminar al conductor ' + c.nombreCompleto + '?'}">
+                                        <button class="boton boton-peligro boton-chico" type="submit">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="vacio" th:if="${pagina.empty}">No se encontraron conductores con los datos indicados.</p>
+            <div th:replace="~{fragmentos/paginacion :: paginacion(${pagina}, '/conductores', ${parametros})}"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

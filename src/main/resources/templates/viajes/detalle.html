@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Detalle del viaje')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('viajes')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Detalle del viaje')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2 th:text="${viaje.ruta.descripcion}"></h2>
+                    <p th:text="${'Viaje N.° ' + viaje.id}"></p>
+                </div>
+                <div class="acciones">
+                    <a class="boton boton-secundario" th:href="@{/viajes}">
+                        <th:block th:replace="~{fragmentos/iconos :: volver}"></th:block>Volver
+                    </a>
+                    <a class="boton boton-secundario" th:if="${viaje.estado.name() == 'PROGRAMADO'}" th:href="@{/viajes/{id}/editar(id=${viaje.id})}">Editar</a>
+                    <form th:if="${viaje.estado.name() == 'PROGRAMADO'}" th:action="@{/viajes/{id}/iniciar(id=${viaje.id})}" method="post"
+                          data-confirmar="¿Marcar el viaje como en curso?">
+                        <button class="boton boton-primario" type="submit">Iniciar viaje</button>
+                    </form>
+                    <form th:if="${viaje.estado.name() == 'EN_CURSO'}" th:action="@{/viajes/{id}/finalizar(id=${viaje.id})}" method="post"
+                          data-confirmar="¿Marcar el viaje como finalizado?">
+                        <button class="boton boton-primario" type="submit">Finalizar viaje</button>
+                    </form>
+                    <form th:if="${viaje.estado.name() == 'PROGRAMADO'}" th:action="@{/viajes/{id}/cancelar(id=${viaje.id})}" method="post"
+                          data-confirmar="¿Cancelar el viaje? Se anularán todas sus reservas activas.">
+                        <button class="boton boton-peligro" type="submit">Cancelar viaje</button>
+                    </form>
+                    <form th:if="${viaje.estado.name() == 'PROGRAMADO' or viaje.estado.name() == 'CANCELADO'}" th:action="@{/viajes/{id}/eliminar(id=${viaje.id})}" method="post"
+                          data-confirmar="¿Eliminar el viaje definitivamente?">
+                        <button class="boton boton-peligro" type="submit">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+            <dl class="datos">
+                <div><dt>Salida</dt><dd th:text="${#temporals.format(viaje.fechaSalida, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                <div><dt>Llegada estimada</dt><dd th:text="${#temporals.format(viaje.fechaLlegada, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                <div><dt>Estado</dt><dd><span class="etiqueta" th:classappend="${'estado-' + viaje.estado.name().toLowerCase()}" th:text="${viaje.estado.etiqueta}"></span></dd></div>
+                <div><dt>Precio del pasaje</dt><dd th:text="${'S/ ' + #numbers.formatDecimal(viaje.precio, 1, 'COMMA', 2, 'POINT')}"></dd></div>
+                <div><dt>Bus</dt><dd th:text="${viaje.bus.descripcion}"></dd></div>
+                <div><dt>Conductor</dt><dd th:text="${viaje.conductor.nombreCompleto}"></dd></div>
+                <div><dt>Terminal de salida</dt><dd th:text="${viaje.ruta.origen.terminal}"></dd></div>
+                <div><dt>Terminal de llegada</dt><dd th:text="${viaje.ruta.destino.terminal}"></dd></div>
+            </dl>
+        </section>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Mapa de asientos</h2>
+                    <p th:if="${ventaAbierta}">Haga clic en un asiento libre para reservar o vender. Al hacer clic en uno ocupado verá su reserva.</p>
+                    <p th:unless="${ventaAbierta}">Este viaje ya no admite reservas ni ventas nuevas. Puede consultar las reservas existentes.</p>
+                </div>
+            </div>
+
+            <div th:replace="~{fragmentos/mapa :: mapaAsientos}"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

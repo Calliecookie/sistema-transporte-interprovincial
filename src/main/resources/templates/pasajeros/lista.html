@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragmentos/base :: cabecera('Pasajeros')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('pasajeros')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Pasajeros')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Listado de pasajeros</h2>
+                    <p th:text="${pagina.totalElements + ' pasajeros encontrados'}"></p>
+                </div>
+                <a class="boton boton-dorado" th:href="@{/pasajeros/nuevo}">
+                    <th:block th:replace="~{fragmentos/iconos :: mas}"></th:block>Nuevo pasajero
+                </a>
+            </div>
+
+            <form class="filtros" method="get" th:action="@{/pasajeros}">
+                <div class="campo">
+                    <label for="dni">DNI</label>
+                    <input type="text" id="dni" name="dni" th:value="${dni}" maxlength="8" inputmode="numeric" placeholder="Ej. 45218790">
+                </div>
+                <div class="campo">
+                    <label for="texto">Nombre o apellido</label>
+                    <input type="text" id="texto" name="texto" th:value="${texto}" placeholder="Buscar por nombre">
+                </div>
+                <div class="filtros-acciones">
+                    <button class="boton boton-primario" type="submit">Buscar</button>
+                    <a class="boton boton-secundario" th:href="@{/pasajeros}">Limpiar</a>
+                </div>
+            </form>
+
+            <div class="contenedor-tabla" th:if="${!pagina.empty}">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>DNI</th><th>Pasajero</th><th>Teléfono</th><th>Correo</th><th>Nacimiento</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p : ${pagina.content}">
+                            <td th:text="${p.dni}"></td>
+                            <td th:text="${p.apellidos + ', ' + p.nombres}"></td>
+                            <td th:text="${p.telefono} ?: '—'"></td>
+                            <td th:text="${p.correo} ?: '—'"></td>
+                            <td th:text="${p.fechaNacimiento != null} ? ${#temporals.format(p.fechaNacimiento, 'dd/MM/yyyy')} : '—'"></td>
+                            <td>
+                                <div class="acciones">
+                                    <a class="boton boton-secundario boton-chico" th:href="@{/pasajeros/{id}/editar(id=${p.id})}">Editar</a>
+                                    <form sec:authorize="hasRole('ADMIN')" th:action="@{/pasajeros/{id}/eliminar(id=${p.id})}" method="post"
+                                          th:data-confirmar="${'¿Eliminar al pasajero ' + p.nombreCompleto + '?'}">
+                                        <button class="boton boton-peligro boton-chico" type="submit">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="vacio" th:if="${pagina.empty}">No se encontraron pasajeros con los datos indicados.</p>
+            <div th:replace="~{fragmentos/paginacion :: paginacion(${pagina}, '/pasajeros', ${parametros})}"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

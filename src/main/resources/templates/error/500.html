@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Error del sistema')}"></head>
+<body>
+<main class="pagina-error">
+    <div class="tarjeta-error">
+        <div class="codigo-error">500</div>
+        <h1>Ocurrió un error en el sistema</h1>
+        <p>No fue posible completar la operación. Inténtelo nuevamente en unos momentos; si el problema continúa, comuníquese con el administrador.</p>
+        <a class="boton boton-primario" th:href="@{/}">Ir al inicio</a>
+    </div>
+</main>
+</body>
+</html>

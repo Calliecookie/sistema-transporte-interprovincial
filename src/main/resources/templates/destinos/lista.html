@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Destinos')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('destinos')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Destinos')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Ciudades y terminales</h2>
+                    <p th:text="${pagina.totalElements + ' destinos encontrados'}"></p>
+                </div>
+                <a class="boton boton-dorado" th:href="@{/destinos/nuevo}">
+                    <th:block th:replace="~{fragmentos/iconos :: mas}"></th:block>Nuevo destino
+                </a>
+            </div>
+
+            <form class="filtros" method="get" th:action="@{/destinos}">
+                <div class="campo">
+                    <label for="texto">Ciudad, departamento o terminal</label>
+                    <input type="text" id="texto" name="texto" th:value="${texto}" placeholder="Buscar destino">
+                </div>
+                <div class="filtros-acciones">
+                    <button class="boton boton-primario" type="submit">Buscar</button>
+                    <a class="boton boton-secundario" th:href="@{/destinos}">Limpiar</a>
+                </div>
+            </form>
+
+            <div class="contenedor-tabla" th:if="${!pagina.empty}">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Ciudad</th><th>Departamento</th><th>Terminal</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="d : ${pagina.content}">
+                            <td><strong th:text="${d.nombre}"></strong></td>
+                            <td th:text="${d.departamento}"></td>
+                            <td th:text="${d.terminal}"></td>
+                            <td>
+                                <div class="acciones">
+                                    <a class="boton boton-secundario boton-chico" th:href="@{/destinos/{id}/editar(id=${d.id})}">Editar</a>
+                                    <form th:action="@{/destinos/{id}/eliminar(id=${d.id})}" method="post"
+                                          th:data-confirmar="${'¿Eliminar el destino ' + d.nombre + '?'}">
+                                        <button class="boton boton-peligro boton-chico" type="submit">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="vacio" th:if="${pagina.empty}">No se encontraron destinos con los datos indicados.</p>
+            <div th:replace="~{fragmentos/paginacion :: paginacion(${pagina}, '/destinos', ${parametros})}"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

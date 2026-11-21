@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Reportes')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('reportes')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Reportes')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="tarjetas tarjetas-reportes">
+            <article class="tarjeta-reporte">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: calendario}"></th:block></span>
+                <h2>Reporte de viajes</h2>
+                <p>Salidas por fecha, ruta y estado, con la ocupación de cada bus y los ingresos por pasajes.</p>
+                <a class="boton boton-primario" th:href="@{/reportes/viajes}">Ver reporte</a>
+            </article>
+            <article class="tarjeta-reporte">
+                <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: usuarios}"></th:block></span>
+                <h2>Reporte de pasajeros</h2>
+                <p>Pasajeros por viaje con su asiento, el estado de la reserva y el pasaje emitido.</p>
+                <a class="boton boton-primario" th:href="@{/reportes/pasajeros}">Ver reporte</a>
+            </article>
+        </section>
+    </main>
+</div>
+</body>
+</html>

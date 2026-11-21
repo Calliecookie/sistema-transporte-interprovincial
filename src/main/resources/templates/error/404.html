@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Página no encontrada')}"></head>
+<body>
+<main class="pagina-error">
+    <div class="tarjeta-error">
+        <div class="codigo-error">404</div>
+        <h1>No encontramos lo que busca</h1>
+        <p th:text="${mensaje != null} ? ${mensaje} : 'La página o el registro solicitado no existe o fue eliminado.'">La página no existe.</p>
+        <a class="boton boton-primario" th:href="@{/}">Ir al inicio</a>
+    </div>
+</main>
+</body>
+</html>

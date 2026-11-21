@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Pasajero')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('pasajeros')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado(${pasajero.id == null ? 'Nuevo pasajero' : 'Editar pasajero'})}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <form class="panel formulario" method="post" th:object="${pasajero}"
+              th:action="${pasajero.id == null} ? @{/pasajeros} : @{/pasajeros/{id}(id=${pasajero.id})}">
+            <div class="alerta alerta-error" th:if="${#fields.hasGlobalErrors()}">
+                <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+            </div>
+
+            <div class="rejilla-2">
+                <div class="campo" th:classappend="${#fields.hasErrors('dni')} ? 'con-error'">
+                    <label for="dni">DNI</label>
+                    <input type="text" th:field="*{dni}" maxlength="8" inputmode="numeric" pattern="\d{8}"
+                           title="Ingrese los 8 dígitos del DNI" placeholder="8 dígitos" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'con-error'">
+                    <label for="fechaNacimiento">Fecha de nacimiento</label>
+                    <input type="date" th:field="*{fechaNacimiento}">
+                    <span class="error-campo" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('nombres')} ? 'con-error'">
+                    <label for="nombres">Nombres</label>
+                    <input type="text" th:field="*{nombres}" maxlength="80" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('apellidos')} ? 'con-error'">
+                    <label for="apellidos">Apellidos</label>
+                    <input type="text" th:field="*{apellidos}" maxlength="80" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('telefono')} ? 'con-error'">
+                    <label for="telefono">Teléfono celular</label>
+                    <input type="text" th:field="*{telefono}" maxlength="9" inputmode="numeric" pattern="9\d{8}"
+                           title="Ingrese 9 dígitos que empiecen con 9" placeholder="9XXXXXXXX">
+                    <span class="error-campo" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('correo')} ? 'con-error'">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" th:field="*{correo}" maxlength="100" placeholder="nombre@correo.pe">
+                    <span class="error-campo" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></span>
+                </div>
+            </div>
+
+            <div class="acciones-formulario">
+                <button class="boton boton-primario" type="submit">Guardar</button>
+                <a class="boton boton-secundario" th:href="@{/pasajeros}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

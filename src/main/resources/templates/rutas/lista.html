@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Rutas')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('rutas')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Rutas')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Rutas disponibles</h2>
+                    <p th:text="${pagina.totalElements + ' rutas encontradas'}"></p>
+                </div>
+                <a class="boton boton-dorado" th:href="@{/rutas/nueva}">
+                    <th:block th:replace="~{fragmentos/iconos :: mas}"></th:block>Nueva ruta
+                </a>
+            </div>
+
+            <form class="filtros" method="get" th:action="@{/rutas}">
+                <div class="campo">
+                    <label for="origenId">Origen</label>
+                    <select id="origenId" name="origenId">
+                        <option value="">Todos</option>
+                        <option th:each="d : ${destinos}" th:value="${d.id}" th:text="${d.nombre}" th:selected="${origenId != null and origenId == d.id}"></option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="destinoId">Destino</label>
+                    <select id="destinoId" name="destinoId">
+                        <option value="">Todos</option>
+                        <option th:each="d : ${destinos}" th:value="${d.id}" th:text="${d.nombre}" th:selected="${destinoId != null and destinoId == d.id}"></option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="activa">Estado</label>
+                    <select id="activa" name="activa">
+                        <option value="">Todas</option>
+                        <option value="true" th:selected="${activa != null and activa == true}">Activas</option>
+                        <option value="false" th:selected="${activa != null and activa == false}">Inactivas</option>
+                    </select>
+                </div>
+                <div class="filtros-acciones">
+                    <button class="boton boton-primario" type="submit">Buscar</button>
+                    <a class="boton boton-secundario" th:href="@{/rutas}">Limpiar</a>
+                </div>
+            </form>
+
+            <div class="contenedor-tabla" th:if="${!pagina.empty}">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Ruta</th><th class="derecha">Distancia</th><th class="derecha">Duración</th><th class="derecha">Precio base</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${pagina.content}">
+                            <td><strong th:text="${r.descripcion}"></strong></td>
+                            <td class="derecha" th:text="${r.distanciaKm + ' km'}"></td>
+                            <td class="derecha" th:text="${r.duracionHoras + ' h'}"></td>
+                            <td class="derecha" th:text="${'S/ ' + #numbers.formatDecimal(r.precioBase, 1, 'COMMA', 2, 'POINT')}"></td>
+                            <td><span class="etiqueta" th:classappend="${r.activa} ? 'estado-activo' : 'estado-inactivo'" th:text="${r.activa} ? 'Activa' : 'Inactiva'"></span></td>
+                            <td>
+                                <div class="acciones">
+                                    <a class="boton boton-secundario boton-chico" th:href="@{/rutas/{id}/editar(id=${r.id})}">Editar</a>
+                                    <form th:action="@{/rutas/{id}/eliminar(id=${r.id})}" method="post"
+                                          th:data-confirmar="${'¿Eliminar la ruta ' + r.descripcion + '?'}">
+                                        <button class="boton boton-peligro boton-chico" type="submit">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="vacio" th:if="${pagina.empty}">No se encontraron rutas con los datos indicados.</p>
+            <div th:replace="~{fragmentos/paginacion :: paginacion(${pagina}, '/rutas', ${parametros})}"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

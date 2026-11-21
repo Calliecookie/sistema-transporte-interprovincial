@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Bus')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('buses')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado(${bus.id == null ? 'Nuevo bus' : 'Editar bus'})}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <form class="panel formulario" method="post" th:object="${bus}"
+              th:action="${bus.id == null} ? @{/buses} : @{/buses/{id}(id=${bus.id})}">
+            <div class="alerta alerta-error" th:if="${#fields.hasGlobalErrors()}">
+                <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+            </div>
+
+            <div class="rejilla-2">
+                <div class="campo" th:classappend="${#fields.hasErrors('placa')} ? 'con-error'">
+                    <label for="placa">Placa</label>
+                    <input type="text" th:field="*{placa}" maxlength="7" pattern="[A-Za-z0-9]{3}-[A-Za-z0-9]{3}"
+                           title="Formato ABC-123" placeholder="ABC-123" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('placa')}" th:errors="*{placa}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('anioFabricacion')} ? 'con-error'">
+                    <label for="anioFabricacion">Año de fabricación</label>
+                    <input type="number" th:field="*{anioFabricacion}" min="2000" max="2030" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('anioFabricacion')}" th:errors="*{anioFabricacion}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('marca')} ? 'con-error'">
+                    <label for="marca">Marca</label>
+                    <input type="text" th:field="*{marca}" maxlength="40" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('marca')}" th:errors="*{marca}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('modelo')} ? 'con-error'">
+                    <label for="modelo">Modelo</label>
+                    <input type="text" th:field="*{modelo}" maxlength="40" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('modelo')}" th:errors="*{modelo}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('capacidad')} ? 'con-error'">
+                    <label for="capacidad">Capacidad (asientos)</label>
+                    <input type="number" th:field="*{capacidad}" min="20" max="60" required>
+                    <span class="ayuda">Entre 20 y 60 asientos. Los asientos de cada viaje se generan con este número.</span>
+                    <span class="error-campo" th:if="${#fields.hasErrors('capacidad')}" th:errors="*{capacidad}"></span>
+                </div>
+                <div class="campo">
+                    <label class="opcion-marcada"><input type="checkbox" th:field="*{activo}"> Bus activo (disponible para programar viajes)</label>
+                </div>
+            </div>
+
+            <div class="acciones-formulario">
+                <button class="boton boton-primario" type="submit">Guardar</button>
+                <a class="boton boton-secundario" th:href="@{/buses}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

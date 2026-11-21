@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Usuarios')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('usuarios')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Usuarios del sistema')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Cuentas de acceso</h2>
+                    <p th:text="${usuarios.size() + ' usuarios registrados'}"></p>
+                </div>
+                <a class="boton boton-dorado" th:href="@{/usuarios/nuevo}">
+                    <th:block th:replace="~{fragmentos/iconos :: mas}"></th:block>Nuevo usuario
+                </a>
+            </div>
+            <div class="contenedor-tabla">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Usuario</th><th>Nombre completo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="u : ${usuarios}">
+                            <td><strong th:text="${u.nombreUsuario}"></strong></td>
+                            <td th:text="${u.nombreCompleto}"></td>
+                            <td><span class="etiqueta" th:classappend="${u.rol.name() == 'ADMIN'} ? 'estado-en_curso' : 'estado-programado'" th:text="${u.rol.etiqueta}"></span></td>
+                            <td><span class="etiqueta" th:classappend="${u.activo} ? 'estado-activo' : 'estado-inactivo'" th:text="${u.activo} ? 'Activo' : 'Inactivo'"></span></td>
+                            <td>
+                                <div class="acciones">
+                                    <a class="boton boton-secundario boton-chico" th:href="@{/usuarios/{id}/editar(id=${u.id})}">Editar</a>
+                                    <form th:action="@{/usuarios/{id}/eliminar(id=${u.id})}" method="post"
+                                          th:data-confirmar="${'¿Eliminar al usuario ' + u.nombreUsuario + '?'}">
+                                        <button class="boton boton-peligro boton-chico" type="submit">Eliminar</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

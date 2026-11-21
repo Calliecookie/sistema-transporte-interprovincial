@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Pasaje')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('pasajes')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Pasaje')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <div class="acciones no-imprimir barra-boleto">
+            <a class="boton boton-secundario" th:href="@{/pasajes}">
+                <th:block th:replace="~{fragmentos/iconos :: volver}"></th:block>Volver
+            </a>
+            <button class="boton boton-primario" type="button" data-imprimir>
+                <th:block th:replace="~{fragmentos/iconos :: imprimir}"></th:block>Imprimir
+            </button>
+        </div>
+
+        <article class="boleto">
+            <div class="boleto-cabecera">
+                <strong>Transportes Andinos</strong>
+                <span class="boleto-codigo" th:text="${pasaje.codigo}"></span>
+            </div>
+            <div class="boleto-cuerpo">
+                <div class="boleto-ruta">
+                    <div class="boleto-ciudad">
+                        <span th:text="${pasaje.reserva.viaje.ruta.origen.nombre}"></span>
+                        <small th:text="${pasaje.reserva.viaje.ruta.origen.terminal}"></small>
+                    </div>
+                    <div class="boleto-flecha"></div>
+                    <div class="boleto-ciudad">
+                        <span th:text="${pasaje.reserva.viaje.ruta.destino.nombre}"></span>
+                        <small th:text="${pasaje.reserva.viaje.ruta.destino.terminal}"></small>
+                    </div>
+                </div>
+                <dl class="datos">
+                    <div><dt>Pasajero</dt><dd th:text="${pasaje.reserva.pasajero.nombreCompleto}"></dd></div>
+                    <div><dt>DNI</dt><dd th:text="${pasaje.reserva.pasajero.dni}"></dd></div>
+                    <div><dt>Asiento</dt><dd th:text="${pasaje.reserva.asiento.numero}"></dd></div>
+                    <div><dt>Salida</dt><dd th:text="${#temporals.format(pasaje.reserva.viaje.fechaSalida, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                    <div><dt>Llegada estimada</dt><dd th:text="${#temporals.format(pasaje.reserva.viaje.fechaLlegada, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                    <div><dt>Bus</dt><dd th:text="${pasaje.reserva.viaje.bus.placa}"></dd></div>
+                    <div><dt>Monto pagado</dt><dd th:text="${'S/ ' + #numbers.formatDecimal(pasaje.precio, 1, 'COMMA', 2, 'POINT')}"></dd></div>
+                    <div><dt>Método de pago</dt><dd th:text="${pasaje.metodoPago.etiqueta}"></dd></div>
+                    <div><dt>Fecha de venta</dt><dd th:text="${#temporals.format(pasaje.fechaVenta, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                    <div><dt>Estado</dt><dd><span class="etiqueta" th:classappend="${'estado-' + pasaje.estado.name().toLowerCase()}" th:text="${pasaje.estado.etiqueta}"></span></dd></div>
+                </dl>
+            </div>
+        </article>
+    </main>
+</div>
+</body>
+</html>

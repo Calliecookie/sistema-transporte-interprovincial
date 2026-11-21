@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Destino')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('destinos')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado(${destino.id == null ? 'Nuevo destino' : 'Editar destino'})}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <form class="panel formulario" method="post" th:object="${destino}"
+              th:action="${destino.id == null} ? @{/destinos} : @{/destinos/{id}(id=${destino.id})}">
+            <div class="alerta alerta-error" th:if="${#fields.hasGlobalErrors()}">
+                <p th:each="error : ${#fields.globalErrors()}" th:text="${error}"></p>
+            </div>
+
+            <div class="rejilla-2">
+                <div class="campo" th:classappend="${#fields.hasErrors('nombre')} ? 'con-error'">
+                    <label for="nombre">Ciudad</label>
+                    <input type="text" th:field="*{nombre}" maxlength="60" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('departamento')} ? 'con-error'">
+                    <label for="departamento">Departamento</label>
+                    <input type="text" th:field="*{departamento}" maxlength="60" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('departamento')}" th:errors="*{departamento}"></span>
+                </div>
+                <div class="campo ancho-completo" th:classappend="${#fields.hasErrors('terminal')} ? 'con-error'">
+                    <label for="terminal">Terminal de embarque</label>
+                    <input type="text" th:field="*{terminal}" maxlength="100" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('terminal')}" th:errors="*{terminal}"></span>
+                </div>
+            </div>
+
+            <div class="acciones-formulario">
+                <button class="boton boton-primario" type="submit">Guardar</button>
+                <a class="boton boton-secundario" th:href="@{/destinos}">Cancelar</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

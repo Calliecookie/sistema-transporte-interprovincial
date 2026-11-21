@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Elegir asiento')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('venta')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Elegir asiento')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2 th:text="${viaje.ruta.descripcion}"></h2>
+                    <p th:text="${'Viaje N.° ' + viaje.id}"></p>
+                </div>
+                <a class="boton boton-secundario" th:href="@{/reservas/viajes}">
+                    <th:block th:replace="~{fragmentos/iconos :: volver}"></th:block>Volver a los viajes
+                </a>
+            </div>
+            <dl class="datos">
+                <div><dt>Salida</dt><dd th:text="${#temporals.format(viaje.fechaSalida, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                <div><dt>Llegada estimada</dt><dd th:text="${#temporals.format(viaje.fechaLlegada, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                <div><dt>Estado</dt><dd><span class="etiqueta" th:classappend="${'estado-' + viaje.estado.name().toLowerCase()}" th:text="${viaje.estado.etiqueta}"></span></dd></div>
+                <div><dt>Precio del pasaje</dt><dd th:text="${'S/ ' + #numbers.formatDecimal(viaje.precio, 1, 'COMMA', 2, 'POINT')}"></dd></div>
+                <div><dt>Bus</dt><dd th:text="${viaje.bus.descripcion}"></dd></div>
+                <div><dt>Terminal de salida</dt><dd th:text="${viaje.ruta.origen.terminal}"></dd></div>
+            </dl>
+        </section>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Mapa de asientos</h2>
+                    <p th:if="${ventaAbierta}">Haga clic en un asiento libre para reservar o vender. Al hacer clic en uno ocupado verá su reserva.</p>
+                    <p th:unless="${ventaAbierta}">Este viaje ya no admite reservas ni ventas nuevas. Puede consultar las reservas existentes.</p>
+                </div>
+            </div>
+            <div th:replace="~{fragmentos/mapa :: mapaAsientos}"></div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

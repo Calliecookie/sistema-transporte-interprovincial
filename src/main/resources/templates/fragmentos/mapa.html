@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="mapa-asientos" th:fragment="mapaAsientos">
+    <div class="autobus">
+        <div class="autobus-frente">
+            <th:block th:replace="~{fragmentos/iconos :: volante}"></th:block>
+            <span>Frente del bus</span>
+        </div>
+        <div class="rejilla-asientos">
+            <th:block th:each="a : ${asientos}" th:with="reserva=${reservasPorAsiento.get(a.id)}">
+                <a th:if="${a.estado.name() == 'LIBRE' and ventaAbierta}" class="asiento libre"
+                   th:href="@{/reservas/nueva(viajeId=${viaje.id}, asientoId=${a.id})}"
+                   th:title="${'Asiento ' + a.numero + ': libre'}" th:text="${a.numero}"></a>
+                <span th:if="${a.estado.name() == 'LIBRE' and !ventaAbierta}" class="asiento libre inactivo"
+                      th:title="${'Asiento ' + a.numero + ': libre'}" th:text="${a.numero}"></span>
+                <a th:if="${a.estado.name() != 'LIBRE' and reserva != null}" class="asiento"
+                   th:classappend="${a.estado.name() == 'VENDIDO'} ? 'vendido' : 'reservado'"
+                   th:href="@{/reservas/{id}(id=${reserva.id})}"
+                   th:title="${'Asiento ' + a.numero + ': ' + reserva.pasajero.nombreCompleto}" th:text="${a.numero}"></a>
+                <span th:if="${a.estado.name() != 'LIBRE' and reserva == null}" class="asiento vendido inactivo"
+                      th:title="${'Asiento ' + a.numero + ': ocupado'}" th:text="${a.numero}"></span>
+            </th:block>
+        </div>
+    </div>
+
+    <ul class="leyenda">
+        <li><span class="muestra libre"></span>Libre</li>
+        <li><span class="muestra reservado"></span>Reservado</li>
+        <li><span class="muestra vendido"></span>Vendido</li>
+    </ul>
+
+    <div class="resumen-asientos">
+        <div><strong th:text="${viaje.asientosLibres}">0</strong>libres</div>
+        <div><strong th:text="${totalReservados}">0</strong>reservados</div>
+        <div><strong th:text="${totalVendidos}">0</strong>vendidos</div>
+    </div>
+</div>
+</body>
+</html>
