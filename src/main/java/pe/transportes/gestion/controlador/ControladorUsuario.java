@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pe.transportes.gestion.modelo.FormularioUsuario;
 import pe.transportes.gestion.modelo.Rol;
+import pe.transportes.gestion.servicio.ServicioConductor;
 import pe.transportes.gestion.servicio.ServicioUsuario;
 import pe.transportes.gestion.util.ErroresFormulario;
 import pe.transportes.gestion.util.ReglaNegocioException;
@@ -23,9 +24,11 @@ public class ControladorUsuario {
     private static final String FORMULARIO = "usuarios/formulario";
 
     private final ServicioUsuario servicio;
+    private final ServicioConductor servicioConductor;
 
-    public ControladorUsuario(ServicioUsuario servicio) {
+    public ControladorUsuario(ServicioUsuario servicio, ServicioConductor servicioConductor) {
         this.servicio = servicio;
+        this.servicioConductor = servicioConductor;
     }
 
     @GetMapping
@@ -37,7 +40,7 @@ public class ControladorUsuario {
     @GetMapping("/nuevo")
     public String nuevo(Model modelo) {
         modelo.addAttribute("formulario", new FormularioUsuario());
-        modelo.addAttribute("roles", Rol.values());
+        cargarOpciones(modelo);
         modelo.addAttribute("usuarioId", null);
         return FORMULARIO;
     }
@@ -54,7 +57,7 @@ public class ControladorUsuario {
                 ErroresFormulario.registrar(resultado, excepcion);
             }
         }
-        modelo.addAttribute("roles", Rol.values());
+        cargarOpciones(modelo);
         modelo.addAttribute("usuarioId", null);
         return FORMULARIO;
     }
@@ -62,7 +65,7 @@ public class ControladorUsuario {
     @GetMapping("/{id}/editar")
     public String editar(@PathVariable Long id, Model modelo) {
         modelo.addAttribute("formulario", servicio.formulario(id));
-        modelo.addAttribute("roles", Rol.values());
+        cargarOpciones(modelo);
         modelo.addAttribute("usuarioId", id);
         return FORMULARIO;
     }
@@ -79,9 +82,14 @@ public class ControladorUsuario {
                 ErroresFormulario.registrar(resultado, excepcion);
             }
         }
-        modelo.addAttribute("roles", Rol.values());
+        cargarOpciones(modelo);
         modelo.addAttribute("usuarioId", id);
         return FORMULARIO;
+    }
+
+    private void cargarOpciones(Model modelo) {
+        modelo.addAttribute("roles", Rol.values());
+        modelo.addAttribute("conductores", servicioConductor.listarActivos());
     }
 
     @PostMapping("/{id}/eliminar")

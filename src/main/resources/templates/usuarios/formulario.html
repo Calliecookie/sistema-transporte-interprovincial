@@ -27,11 +27,20 @@
                 </div>
                 <div class="campo" th:classappend="${#fields.hasErrors('rol')} ? 'con-error'">
                     <label for="rol">Rol</label>
-                    <select th:field="*{rol}" required>
+                    <select th:field="*{rol}" required data-rol-usuario>
                         <option value="">Seleccione un rol</option>
                         <option th:each="r : ${roles}" th:value="${r.name()}" th:text="${r.etiqueta}"></option>
                     </select>
                     <span class="error-campo" th:if="${#fields.hasErrors('rol')}" th:errors="*{rol}"></span>
+                </div>
+                <div class="campo" data-solo-conductor th:classappend="${#fields.hasErrors('idConductor')} ? 'con-error'">
+                    <label for="idConductor">Conductor vinculado</label>
+                    <select th:field="*{idConductor}">
+                        <option value="">Seleccione un conductor</option>
+                        <option th:each="c : ${conductores}" th:value="${c.id}" th:text="${c.nombreCompleto + ' (DNI ' + c.dni + ')'}"></option>
+                    </select>
+                    <span class="ayuda">El conductor verá sus viajes asignados, la ocupación del bus y podrá reportar incidencias.</span>
+                    <span class="error-campo" th:if="${#fields.hasErrors('idConductor')}" th:errors="*{idConductor}"></span>
                 </div>
                 <div class="campo">
                     <label class="opcion-marcada"><input type="checkbox" th:field="*{activo}"> Usuario activo (puede iniciar sesión)</label>

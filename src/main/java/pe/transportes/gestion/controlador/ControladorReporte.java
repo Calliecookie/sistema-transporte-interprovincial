@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import pe.transportes.gestion.modelo.EstadoReserva;
@@ -121,6 +122,18 @@ public class ControladorReporte {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
         return respuestaCsv("reporte_pasajeros", servicio.csvPasajeros(dni, estado, rutaId, desde, hasta));
+    }
+
+    @GetMapping("/viajes/{id}/pasajeros")
+    public String pasajerosDelViaje(@PathVariable Long id, Model modelo) {
+        modelo.addAttribute("ocupacion", servicio.ocupacionDelViaje(id));
+        modelo.addAttribute("filas", servicio.pasajerosDelViaje(id));
+        return "reportes/pasajeros_viaje";
+    }
+
+    @GetMapping("/viajes/{id}/pasajeros/csv")
+    public ResponseEntity<byte[]> pasajerosDelViajeCsv(@PathVariable Long id) {
+        return respuestaCsv("pasajeros_viaje_" + id, servicio.csvPasajerosDelViaje(id));
     }
 
     private ResponseEntity<byte[]> respuestaCsv(String prefijo, byte[] contenido) {

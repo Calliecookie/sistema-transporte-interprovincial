@@ -6,7 +6,10 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -43,6 +46,18 @@ public class Usuario {
 
     @Column(name = "activo", nullable = false)
     private boolean activo = true;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "conductor_id")
+    private Conductor conductor;
+
+    public Conductor getConductor() {
+        return conductor;
+    }
+
+    public void setConductor(Conductor conductor) {
+        this.conductor = conductor;
+    }
 
     public Long getId() {
         return id;

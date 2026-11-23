@@ -16,6 +16,31 @@
             </a>
         </section>
 
+        <section class="panel panel-alertas" th:if="${!alertas.empty}">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Alertas de viaje</h2>
+                    <p>Reportes de los conductores que requieren atención.</p>
+                </div>
+                <a class="boton boton-peligro" th:href="@{/alertas}">Ver todas</a>
+            </div>
+            <div class="lista-alertas">
+                <article class="tarjeta-alerta" th:each="alerta, it : ${alertas}" th:if="${it.index < 5}" th:classappend="${'nivel-' + alerta.nivel()}">
+                    <div class="tarjeta-alerta-cuerpo">
+                        <span class="tarjeta-alerta-titulo">
+                            <th:block th:replace="~{fragmentos/iconos :: aviso}"></th:block>
+                            <strong th:text="${alerta.titulo()}"></strong>
+                        </span>
+                        <p class="tarjeta-alerta-viaje">
+                            <span th:text="${'Viaje N.° ' + alerta.viaje().id + ' · ' + alerta.viaje().ruta.descripcion}"></span>
+                            <span th:text="${'Bus ' + alerta.viaje().bus.placa + ' · ' + alerta.viaje().conductor.nombreCompleto}"></span>
+                        </p>
+                        <p th:if="${!#strings.isEmpty(alerta.detalle())}" th:text="${alerta.detalle()}"></p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
         <section class="tarjetas">
             <article class="tarjeta-resumen">
                 <span class="tarjeta-icono"><th:block th:replace="~{fragmentos/iconos :: usuarios}"></th:block></span>

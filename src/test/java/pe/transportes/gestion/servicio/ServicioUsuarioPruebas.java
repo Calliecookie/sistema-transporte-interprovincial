@@ -16,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import pe.transportes.gestion.modelo.FormularioUsuario;
 import pe.transportes.gestion.modelo.Rol;
 import pe.transportes.gestion.modelo.Usuario;
+import pe.transportes.gestion.repositorio.ConductorRepositorio;
+import pe.transportes.gestion.repositorio.IncidenciaRepositorio;
 import pe.transportes.gestion.repositorio.PasajeRepositorio;
 import pe.transportes.gestion.repositorio.ReservaRepositorio;
 import pe.transportes.gestion.repositorio.UsuarioRepositorio;
@@ -40,7 +42,8 @@ class ServicioUsuarioPruebas {
         usuarioActual = mock(UsuarioActual.class);
         codificador = new BCryptPasswordEncoder();
         servicio = new ServicioUsuario(repositorio, reservaRepositorio, pasajeRepositorio, codificador,
-                usuarioActual, mock(ValidadorEntidades.class));
+                usuarioActual, mock(ValidadorEntidades.class), mock(ConductorRepositorio.class),
+                mock(IncidenciaRepositorio.class));
         when(repositorio.save(any(Usuario.class))).thenAnswer(invocacion -> invocacion.getArgument(0));
     }
 

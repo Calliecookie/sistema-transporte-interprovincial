@@ -2,7 +2,8 @@ package pe.transportes.gestion.modelo;
 
 public enum Rol {
     ADMIN("Administrador"),
-    VENDEDOR("Vendedor");
+    VENDEDOR("Vendedor"),
+    CONDUCTOR("Conductor");
 
     private final String etiqueta;
 

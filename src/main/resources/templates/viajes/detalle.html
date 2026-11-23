@@ -18,12 +18,13 @@
                     <a class="boton boton-secundario" th:href="@{/viajes}">
                         <th:block th:replace="~{fragmentos/iconos :: volver}"></th:block>Volver
                     </a>
+                    <a class="boton boton-secundario" th:href="@{/reportes/viajes/{id}/pasajeros(id=${viaje.id})}">Lista de pasajeros</a>
                     <a class="boton boton-secundario" th:if="${viaje.estado.name() == 'PROGRAMADO'}" th:href="@{/viajes/{id}/editar(id=${viaje.id})}">Editar</a>
                     <form th:if="${viaje.estado.name() == 'PROGRAMADO'}" th:action="@{/viajes/{id}/iniciar(id=${viaje.id})}" method="post"
                           data-confirmar="¿Marcar el viaje como en curso?">
                         <button class="boton boton-primario" type="submit">Iniciar viaje</button>
                     </form>
-                    <form th:if="${viaje.estado.name() == 'EN_CURSO'}" th:action="@{/viajes/{id}/finalizar(id=${viaje.id})}" method="post"
+                    <form th:if="${viaje.estado.enRuta}" th:action="@{/viajes/{id}/finalizar(id=${viaje.id})}" method="post"
                           data-confirmar="¿Marcar el viaje como finalizado?">
                         <button class="boton boton-primario" type="submit">Finalizar viaje</button>
                     </form>
@@ -47,6 +48,22 @@
                 <div><dt>Terminal de salida</dt><dd th:text="${viaje.ruta.origen.terminal}"></dd></div>
                 <div><dt>Terminal de llegada</dt><dd th:text="${viaje.ruta.destino.terminal}"></dd></div>
             </dl>
+        </section>
+
+        <section class="panel" th:if="${!incidencias.empty}">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Bitácora del conductor</h2>
+                </div>
+            </div>
+            <ul class="bitacora">
+                <li th:each="i : ${incidencias}" th:classappend="${i.tipo.alerta} ? 'bitacora-alerta'">
+                    <strong th:text="${i.tipo.etiqueta}"></strong>
+                    <span th:if="${i.minutosRetraso != null}" th:text="${'(' + i.minutosRetraso + ' min)'}"></span>
+                    <small th:text="${#temporals.format(i.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></small>
+                    <p th:if="${i.descripcion != null}" th:text="${i.descripcion}"></p>
+                </li>
+            </ul>
         </section>
 
         <section class="panel">

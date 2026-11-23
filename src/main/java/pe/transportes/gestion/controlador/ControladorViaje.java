@@ -21,6 +21,7 @@ import pe.transportes.gestion.modelo.Conductor;
 import pe.transportes.gestion.modelo.EstadoViaje;
 import pe.transportes.gestion.modelo.Ruta;
 import pe.transportes.gestion.modelo.Viaje;
+import pe.transportes.gestion.servicio.ServicioAlerta;
 import pe.transportes.gestion.servicio.ServicioBus;
 import pe.transportes.gestion.servicio.ServicioConductor;
 import pe.transportes.gestion.servicio.ServicioRuta;
@@ -41,9 +42,11 @@ public class ControladorViaje {
     private final ServicioRuta servicioRuta;
     private final ServicioBus servicioBus;
     private final ServicioConductor servicioConductor;
+    private final ServicioAlerta servicioAlerta;
 
     public ControladorViaje(ServicioViaje servicio, ConstructorMapa constructorMapa, ServicioRuta servicioRuta,
-            ServicioBus servicioBus, ServicioConductor servicioConductor) {
+            ServicioBus servicioBus, ServicioConductor servicioConductor, ServicioAlerta servicioAlerta) {
+        this.servicioAlerta = servicioAlerta;
         this.servicio = servicio;
         this.constructorMapa = constructorMapa;
         this.servicioRuta = servicioRuta;
@@ -108,6 +111,7 @@ public class ControladorViaje {
     @GetMapping("/{id}")
     public String detalle(@PathVariable Long id, Model modelo) {
         constructorMapa.cargar(modelo, id);
+        modelo.addAttribute("incidencias", servicioAlerta.delViaje(id));
         return "viajes/detalle";
     }
 

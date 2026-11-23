@@ -9,27 +9,32 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import pe.transportes.gestion.modelo.Conductor;
 import pe.transportes.gestion.modelo.Rol;
 import pe.transportes.gestion.modelo.Usuario;
+import pe.transportes.gestion.repositorio.ConductorRepositorio;
 import pe.transportes.gestion.repositorio.UsuarioRepositorio;
 
 class InicializadorUsuariosPruebas {
 
     private UsuarioRepositorio repositorio;
     private PasswordEncoder codificador;
+    private ConductorRepositorio conductorRepositorio;
     private InicializadorUsuarios inicializador;
 
     @BeforeEach
     void preparar() {
         repositorio = mock(UsuarioRepositorio.class);
         codificador = new BCryptPasswordEncoder();
-        inicializador = new InicializadorUsuarios(repositorio, codificador);
+        conductorRepositorio = mock(ConductorRepositorio.class);
+        inicializador = new InicializadorUsuarios(repositorio, codificador, conductorRepositorio);
     }
 
     @Test
@@ -59,6 +64,26 @@ class InicializadorUsuariosPruebas {
         assertThat(codificador.matches("Admin123*", admin.getContrasena())).isTrue();
         Usuario vendedor = captor.getAllValues().get(1);
         assertThat(codificador.matches("Vendedor123*", vendedor.getContrasena())).isTrue();
+    }
+
+    @Test
+    void creaElUsuarioConductorVinculadoAlPrimerConductorActivo() {
+        Conductor conductor = new Conductor();
+        conductor.setId(1L);
+        conductor.setNombres("Carlos Alberto");
+        conductor.setApellidos("Quispe Mamani");
+        when(repositorio.count()).thenReturn(0L);
+        when(conductorRepositorio.findFirstByActivoTrueOrderByIdAsc()).thenReturn(Optional.of(conductor));
+
+        inicializador.run(new DefaultApplicationArguments());
+
+        ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
+        verify(repositorio, times(3)).save(captor.capture());
+        Usuario creado = captor.getAllValues().get(2);
+        assertThat(creado.getNombreUsuario()).isEqualTo("conductor");
+        assertThat(creado.getRol()).isEqualTo(Rol.CONDUCTOR);
+        assertThat(creado.getConductor()).isSameAs(conductor);
+        assertThat(codificador.matches("Conductor123*", creado.getContrasena())).isTrue();
     }
 
     @Test

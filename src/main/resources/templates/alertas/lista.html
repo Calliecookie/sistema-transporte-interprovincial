@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragmentos/base :: cabecera('Alertas de viaje')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('alertas')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Alertas de viaje')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Alertas sin atender</h2>
+                    <p th:text="${'Accidentes, retrasos y pausas reportados por los conductores, y buses que no confirmaron su llegada pasados ' + tolerancia + ' minutos de la hora estimada.'}"></p>
+                </div>
+            </div>
+            <div class="lista-alertas" th:if="${!alertas.empty}">
+                <article class="tarjeta-alerta" th:each="alerta : ${alertas}" th:classappend="${'nivel-' + alerta.nivel()}">
+                    <div class="tarjeta-alerta-cuerpo">
+                        <span class="tarjeta-alerta-titulo">
+                            <th:block th:replace="~{fragmentos/iconos :: aviso}"></th:block>
+                            <strong th:text="${alerta.titulo()}"></strong>
+                        </span>
+                        <p class="tarjeta-alerta-viaje">
+                            <span th:text="${'Viaje N.° ' + alerta.viaje().id + ' · ' + alerta.viaje().ruta.descripcion}"></span>
+                            <span th:text="${'Bus ' + alerta.viaje().bus.placa + ' · ' + alerta.viaje().conductor.nombreCompleto}"></span>
+                            <span th:if="${alerta.viaje().conductor.telefono != null}" th:text="${'Teléfono del conductor: ' + alerta.viaje().conductor.telefono}"></span>
+                        </p>
+                        <p th:if="${!#strings.isEmpty(alerta.detalle())}" th:text="${alerta.detalle()}"></p>
+                        <small th:text="${(alerta.atendible() ? 'Reportado el ' : 'Llegada estimada: ') + #temporals.format(alerta.fecha(), 'dd/MM/yyyy HH:mm')}"></small>
+                    </div>
+                    <div class="acciones">
+                        <a class="boton boton-secundario boton-chico" sec:authorize="hasRole('ADMIN')"
+                           th:href="@{/viajes/{id}(id=${alerta.viaje().id})}">Ver viaje</a>
+                        <a class="boton boton-secundario boton-chico" th:href="@{/reportes/viajes/{id}/pasajeros(id=${alerta.viaje().id})}">Pasajeros</a>
+                        <form th:if="${alerta.atendible()}" th:action="@{/alertas/{id}/atender(id=${alerta.incidencia().id})}" method="post"
+                              data-confirmar="¿Marcar la alerta como atendida?">
+                            <button class="boton boton-primario boton-chico" type="submit">Marcar atendida</button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+            <p class="vacio" th:if="${alertas.empty}">No hay alertas pendientes. Todos los viajes avanzan con normalidad.</p>
+        </section>
+
+        <section class="panel" th:if="${!atendidas.empty}">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Atendidas recientemente</h2>
+                </div>
+            </div>
+            <div class="contenedor-tabla">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Tipo</th><th>Viaje</th><th>Detalle</th><th>Reportado</th><th>Atendida por</th><th>Atención</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="i : ${atendidas}">
+                            <td th:text="${i.tipo.etiqueta}"></td>
+                            <td th:text="${'N.° ' + i.viaje.id + ' · ' + i.viaje.ruta.descripcion}"></td>
+                            <td th:text="${i.descripcion != null ? i.descripcion : '—'}"></td>
+                            <td th:text="${#temporals.format(i.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="${i.atendidaPor != null ? i.atendidaPor.nombreCompleto : '—'}"></td>
+                            <td th:text="${i.fechaAtencion != null ? #temporals.format(i.fechaAtencion, 'dd/MM/yyyy HH:mm') : '—'}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

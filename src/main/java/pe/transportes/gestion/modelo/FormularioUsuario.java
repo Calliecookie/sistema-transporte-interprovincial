@@ -26,6 +26,16 @@ public class FormularioUsuario {
 
     private boolean activo = true;
 
+    private Long idConductor;
+
+    public Long getIdConductor() {
+        return idConductor;
+    }
+
+    public void setIdConductor(Long idConductor) {
+        this.idConductor = idConductor;
+    }
+
     public String getNombreUsuario() {
         return nombreUsuario;
     }

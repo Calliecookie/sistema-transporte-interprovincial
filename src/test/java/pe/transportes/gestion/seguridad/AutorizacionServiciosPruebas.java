@@ -86,7 +86,7 @@ class AutorizacionServiciosPruebas {
 
         @Bean
         ServicioUsuario servicioUsuario() {
-            return new ServicioUsuario(null, null, null, null, null, mock(ValidadorEntidades.class));
+            return new ServicioUsuario(null, null, null, null, null, mock(ValidadorEntidades.class), null, null);
         }
     }
 

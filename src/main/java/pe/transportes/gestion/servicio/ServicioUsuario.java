@@ -7,8 +7,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pe.transportes.gestion.modelo.Conductor;
 import pe.transportes.gestion.modelo.FormularioUsuario;
+import pe.transportes.gestion.modelo.Rol;
 import pe.transportes.gestion.modelo.Usuario;
+import pe.transportes.gestion.repositorio.ConductorRepositorio;
+import pe.transportes.gestion.repositorio.IncidenciaRepositorio;
 import pe.transportes.gestion.repositorio.PasajeRepositorio;
 import pe.transportes.gestion.repositorio.ReservaRepositorio;
 import pe.transportes.gestion.repositorio.UsuarioRepositorio;
@@ -27,16 +31,21 @@ public class ServicioUsuario {
     private final PasswordEncoder codificador;
     private final UsuarioActual usuarioActual;
     private final ValidadorEntidades validador;
+    private final ConductorRepositorio conductorRepositorio;
+    private final IncidenciaRepositorio incidenciaRepositorio;
 
     public ServicioUsuario(UsuarioRepositorio repositorio, ReservaRepositorio reservaRepositorio,
             PasajeRepositorio pasajeRepositorio, PasswordEncoder codificador, UsuarioActual usuarioActual,
-            ValidadorEntidades validador) {
+            ValidadorEntidades validador, ConductorRepositorio conductorRepositorio,
+            IncidenciaRepositorio incidenciaRepositorio) {
         this.repositorio = repositorio;
         this.reservaRepositorio = reservaRepositorio;
         this.pasajeRepositorio = pasajeRepositorio;
         this.codificador = codificador;
         this.usuarioActual = usuarioActual;
         this.validador = validador;
+        this.conductorRepositorio = conductorRepositorio;
+        this.incidenciaRepositorio = incidenciaRepositorio;
     }
 
     @Transactional(readOnly = true)
@@ -58,6 +67,7 @@ public class ServicioUsuario {
         formulario.setNombreCompleto(usuario.getNombreCompleto());
         formulario.setRol(usuario.getRol());
         formulario.setActivo(usuario.isActivo());
+        formulario.setIdConductor(usuario.getConductor() == null ? null : usuario.getConductor().getId());
         return formulario;
     }
 
@@ -72,6 +82,7 @@ public class ServicioUsuario {
             throw new ReglaNegocioException("nombreUsuario", "Ya existe un usuario con ese nombre de usuario");
         }
         Usuario usuario = new Usuario();
+        usuario.setConductor(resolverConductor(formulario, 0L));
         copiar(formulario, usuario);
         usuario.setContrasena(codificador.encode(formulario.getContrasena()));
         return repositorio.save(usuario);
@@ -91,6 +102,7 @@ public class ServicioUsuario {
                 && (formulario.getRol() != usuario.getRol() || !formulario.isActivo())) {
             throw new ReglaNegocioException("No puede cambiar el rol ni desactivar su propia cuenta");
         }
+        usuario.setConductor(resolverConductor(formulario, id));
         copiar(formulario, usuario);
         if (formulario.getContrasena() != null) {
             usuario.setContrasena(codificador.encode(formulario.getContrasena()));
@@ -104,11 +116,27 @@ public class ServicioUsuario {
         if (esElUsuarioActual(id)) {
             throw new ReglaNegocioException("No puede eliminar su propia cuenta");
         }
-        if (reservaRepositorio.existsByUsuarioId(id) || pasajeRepositorio.existsByUsuarioId(id)) {
+        if (reservaRepositorio.existsByUsuarioId(id) || pasajeRepositorio.existsByUsuarioId(id)
+                || incidenciaRepositorio.existsByUsuarioIdOrAtendidaPorId(id, id)) {
             throw new ReglaNegocioException(
                     "No se puede eliminar el usuario porque registró reservas o ventas. Puede desactivarlo en su lugar");
         }
         repositorio.delete(usuario);
+    }
+
+    private Conductor resolverConductor(FormularioUsuario formulario, Long id) {
+        if (formulario.getRol() != Rol.CONDUCTOR) {
+            return null;
+        }
+        if (formulario.getIdConductor() == null) {
+            throw new ReglaNegocioException("idConductor", "Seleccione el conductor que usará esta cuenta");
+        }
+        Conductor conductor = conductorRepositorio.findById(formulario.getIdConductor())
+                .orElseThrow(() -> new ReglaNegocioException("idConductor", "El conductor seleccionado no existe"));
+        if (repositorio.existsByConductorIdAndIdNot(conductor.getId(), id)) {
+            throw new ReglaNegocioException("idConductor", "Ese conductor ya tiene una cuenta de usuario");
+        }
+        return conductor;
     }
 
     private boolean esElUsuarioActual(Long id) {

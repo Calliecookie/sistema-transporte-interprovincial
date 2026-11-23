@@ -32,8 +32,12 @@ public class ConfiguracionSeguridad {
                 .authorizeHttpRequests(reglas -> reglas
                         .requestMatchers("/login", "/error", "/acceso-denegado", "/css/**", "/js/**", "/images/**")
                         .permitAll()
+                        .requestMatchers("/").hasAnyRole("ADMIN", "VENDEDOR", "CONDUCTOR")
+                        .requestMatchers("/mis-viajes/**").hasRole("CONDUCTOR")
+                        .requestMatchers("/consultas/dni/conductor/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/pasajeros/*/eliminar").hasRole("ADMIN")
-                        .requestMatchers("/", "/pasajeros/**", "/reservas/**", "/pasajes/**", "/reportes/**")
+                        .requestMatchers("/pasajeros/**", "/reservas/**", "/pasajes/**", "/reportes/**", "/alertas/**",
+                                "/consultas/**")
                         .hasAnyRole("ADMIN", "VENDEDOR")
                         .anyRequest().hasRole("ADMIN"))
                 .formLogin(acceso -> acceso

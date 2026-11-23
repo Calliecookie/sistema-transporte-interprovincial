@@ -1,6 +1,7 @@
 package pe.transportes.gestion.repositorio;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -18,6 +19,14 @@ public interface ViajeRepositorio extends JpaRepository<Viaje, Long>, JpaSpecifi
     boolean existsByConductorId(Long conductorId);
 
     long countByEstado(EstadoViaje estado);
+
+    List<Viaje> findByConductorIdAndEstadoInOrderByFechaSalidaAsc(Long conductorId, Collection<EstadoViaje> estados);
+
+    List<Viaje> findTop10ByConductorIdAndEstadoInOrderByFechaSalidaDesc(Long conductorId,
+            Collection<EstadoViaje> estados);
+
+    List<Viaje> findByEstadoInAndFechaLlegadaBeforeOrderByFechaLlegadaAsc(Collection<EstadoViaje> estados,
+            LocalDateTime limite);
 
     List<Viaje> findTop6ByEstadoAndFechaSalidaAfterOrderByFechaSalidaAsc(EstadoViaje estado, LocalDateTime desde);
 

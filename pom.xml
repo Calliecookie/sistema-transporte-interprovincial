@@ -13,7 +13,7 @@
 
     <groupId>pe.transportes</groupId>
     <artifactId>gestion-transporte</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
     <name>gestion-transporte</name>
     <description>Sistema de gestión de una empresa de transporte interprovincial</description>

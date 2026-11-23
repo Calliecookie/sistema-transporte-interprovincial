@@ -10,9 +10,11 @@ CREATE TABLE usuario (
     nombre_completo VARCHAR(100) NOT NULL,
     rol VARCHAR(20) NOT NULL,
     activo BIT(1) NOT NULL DEFAULT b'1',
+    conductor_id BIGINT NULL,
     PRIMARY KEY (id),
     CONSTRAINT uq_usuario_nombre_usuario UNIQUE (nombre_usuario),
-    CONSTRAINT ck_usuario_rol CHECK (rol IN ('ADMIN', 'VENDEDOR'))
+    CONSTRAINT uq_usuario_conductor UNIQUE (conductor_id),
+    CONSTRAINT ck_usuario_rol CHECK (rol IN ('ADMIN', 'VENDEDOR', 'CONDUCTOR'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE pasajero (
@@ -102,7 +104,7 @@ CREATE TABLE viaje (
     CONSTRAINT fk_viaje_conductor FOREIGN KEY (conductor_id) REFERENCES conductor (id),
     CONSTRAINT ck_viaje_fechas CHECK (fecha_llegada > fecha_salida),
     CONSTRAINT ck_viaje_precio CHECK (precio > 0),
-    CONSTRAINT ck_viaje_estado CHECK (estado IN ('PROGRAMADO', 'EN_CURSO', 'FINALIZADO', 'CANCELADO'))
+    CONSTRAINT ck_viaje_estado CHECK (estado IN ('PROGRAMADO', 'EN_CURSO', 'EN_PAUSA', 'RETRASADO', 'INCIDENTE', 'FINALIZADO', 'CANCELADO'))
 ) ENGINE=InnoDB;
 
 CREATE TABLE asiento (
@@ -152,6 +154,29 @@ CREATE TABLE pasaje (
     CONSTRAINT ck_pasaje_estado CHECK (estado IN ('EMITIDO', 'ANULADO'))
 ) ENGINE=InnoDB;
 
+ALTER TABLE usuario ADD CONSTRAINT fk_usuario_conductor FOREIGN KEY (conductor_id) REFERENCES conductor (id);
+
+CREATE TABLE incidencia (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    viaje_id BIGINT NOT NULL,
+    tipo VARCHAR(15) NOT NULL,
+    descripcion VARCHAR(500) NULL,
+    minutos_retraso INT NULL,
+    fecha_registro DATETIME NOT NULL,
+    usuario_id BIGINT NULL,
+    atendida BIT(1) NOT NULL DEFAULT b'0',
+    atendida_por_id BIGINT NULL,
+    fecha_atencion DATETIME NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_incidencia_viaje FOREIGN KEY (viaje_id) REFERENCES viaje (id),
+    CONSTRAINT fk_incidencia_usuario FOREIGN KEY (usuario_id) REFERENCES usuario (id),
+    CONSTRAINT fk_incidencia_atendida_por FOREIGN KEY (atendida_por_id) REFERENCES usuario (id),
+    CONSTRAINT ck_incidencia_tipo CHECK (tipo IN ('INICIO', 'ACCIDENTE', 'RETRASO', 'PAUSA', 'REANUDACION', 'OBSERVACION', 'LLEGADA')),
+    CONSTRAINT ck_incidencia_minutos CHECK (minutos_retraso IS NULL OR minutos_retraso BETWEEN 1 AND 1440)
+) ENGINE=InnoDB;
+
+CREATE INDEX idx_incidencia_pendiente ON incidencia (atendida, tipo, fecha_registro);
+CREATE INDEX idx_viaje_llegada_estado ON viaje (estado, fecha_llegada);
 CREATE INDEX idx_pasajero_apellidos ON pasajero (apellidos, nombres);
 CREATE INDEX idx_conductor_apellidos ON conductor (apellidos, nombres);
 CREATE INDEX idx_viaje_fecha_salida ON viaje (fecha_salida);

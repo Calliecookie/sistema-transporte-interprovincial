@@ -17,6 +17,7 @@ Caso propuesto Nro. 7. Aplicación web para administrar buses, conductores, ruta
 2. Abra el archivo `base_datos/transporte_interprovincial.sql` (menú File > Open SQL Script).
 3. Ejecute todo el script de una sola vez con el icono del rayo.
 4. Si la base `transporte_interprovincial` ya existía, el script la elimina y la vuelve a crear con los datos de prueba.
+5. Si prefiere conservar los datos de una instalación anterior, ejecute solo `base_datos/actualizacion_1_1_0.sql`.
 
 ### 2. Abrir el proyecto en NetBeans
 
@@ -33,7 +34,19 @@ spring.datasource.username=root
 spring.datasource.password=tu_contrasena
 ```
 
-### 4. Ejecutar
+### 4. Consulta automática de DNI (Factiliza)
+
+Al registrar un pasajero o un conductor, basta con escribir los 8 dígitos del DNI para que los nombres y apellidos se completen solos con los datos de RENIEC, usando la API de [Factiliza](https://factiliza.com). Si el DNI ya está registrado en el sistema, se muestra un aviso.
+
+Para activarla, defina la variable de entorno `FACTILIZA_TOKEN` con su token (en NetBeans: clic derecho al proyecto > Properties > Run > Environment, o en `nbactions.xml`). También puede escribirlo directamente en `application.properties`:
+
+```
+factiliza.token=su_token
+```
+
+Sin token la aplicación funciona igual y los datos se ingresan a mano.
+
+### 5. Ejecutar
 
 Presione F6 (Run Project). No hace falta configurar ningún servidor: Tomcat viene incluido.
 Cuando la consola muestre `Started AplicacionTransporte`, abra http://localhost:8081 en el navegador.
@@ -48,18 +61,23 @@ Los usuarios se crean al iniciar la aplicación, solo cuando la tabla `usuario` 
 |----------|---------------|----------|
 | admin    | Admin123*     | ADMIN    |
 | vendedor | Vendedor123*  | VENDEDOR |
+| conductor | Conductor123* | CONDUCTOR (vinculado al primer conductor activo) |
+
+Para crear más cuentas de conductor, el administrador entra a Usuarios, elige el rol Conductor y selecciona el conductor que usará la cuenta.
 
 ## Permisos por rol
 
-| Sección                                              | ADMIN | VENDEDOR |
-|------------------------------------------------------|:-----:|:--------:|
-| Inicio, reportes (viajes y pasajeros, con CSV)       |  Sí   |    Sí    |
-| Pasajeros (registrar y editar)                       |  Sí   |    Sí    |
-| Eliminar pasajeros                                   |  Sí   |    No    |
-| Vender pasajes, reservas, anulaciones y pasajes      |  Sí   |    Sí    |
-| Programar viajes                                     |  Sí   |    No    |
-| Buses, conductores, destinos y rutas                 |  Sí   |    No    |
-| Usuarios del sistema                                 |  Sí   |    No    |
+| Sección                                              | ADMIN | VENDEDOR | CONDUCTOR |
+|------------------------------------------------------|:-----:|:--------:|:---------:|
+| Inicio, reportes (viajes, pasajeros y pasajeros por viaje, con CSV) |  Sí   |    Sí    |    No     |
+| Alertas de viaje (accidentes, retrasos, pausas y buses sin llegada) |  Sí   |    Sí    |    No     |
+| Pasajeros (registrar y editar)                       |  Sí   |    Sí    |    No     |
+| Eliminar pasajeros                                   |  Sí   |    No    |    No     |
+| Vender pasajes, reservas, anulaciones y pasajes      |  Sí   |    Sí    |    No     |
+| Programar viajes                                     |  Sí   |    No    |    No     |
+| Buses, conductores, destinos y rutas                 |  Sí   |    No    |    No     |
+| Usuarios del sistema                                 |  Sí   |    No    |    No     |
+| Mis viajes (rutas, horarios, ocupación, pasajeros y reportes de ruta) |  No   |    No    |    Sí     |
 
 La restricción se aplica en tres niveles: en las rutas (`SecurityFilterChain`), en los métodos de los servicios (`@PreAuthorize`) y en las vistas (los menús y botones se ocultan según el rol). Si un usuario entra a una dirección que no le corresponde, ve la página 403.
 
@@ -79,6 +97,7 @@ Recomendaciones: formato JPG, menos de 400 KB cada una (calidad 75 a 80), y pref
 
 ```
 base_datos/                      script SQL con las tablas y los datos de prueba
+base_datos/actualizacion_1_1_0.sql  actualiza una base ya creada con la versión anterior
 src/main/java/pe/transportes/gestion
     modelo/                      entidades JPA, enumeraciones y formularios
     repositorio/                 interfaces Spring Data y especificaciones de filtros
@@ -87,6 +106,7 @@ src/main/java/pe/transportes/gestion
     seguridad/                   configuración de Spring Security, usuarios y roles
     util/                        excepciones, exportador CSV y utilidades
     configuracion/               configuración general
+    integracion/                 consulta de DNI con la API de Factiliza
 src/main/resources
     templates/                   vistas Thymeleaf
     static/                      CSS, JavaScript e imágenes
@@ -104,11 +124,27 @@ src/test/java                    pruebas unitarias de las reglas de negocio
 - No se puede cambiar el bus ni la ruta de un viaje que ya tiene reservas.
 - No se pueden eliminar registros que tienen datos relacionados (por ejemplo, un bus con viajes).
 
+## Seguimiento de viajes y alertas
+
+El conductor entra con su cuenta y ve en **Mis viajes**:
+
+- Las rutas planificadas con su horario de salida, llegada estimada, bus y asientos ocupados.
+- La lista de pasajeros de cada viaje con su número de asiento.
+- Botones para registrar la salida, pausar, reanudar, reportar un retraso (con minutos), escribir observaciones, confirmar la llegada y **reportar un accidente**.
+- La bitácora con todo lo registrado en el viaje.
+
+El accidente, el retraso y la pausa generan una alerta que el administrador y los vendedores ven al instante: un aviso rojo en todas las pantallas, un contador en el menú (se actualiza solo cada 30 segundos) y el detalle en **Alertas de viaje**, donde se marcan como atendidas.
+
+Además, si un viaje no se confirma como finalizado una hora después de su llegada estimada, el sistema lo muestra como alerta **Bus sin confirmar llegada**, aunque el conductor no haya reportado nada (por ejemplo, si no tiene señal).
+
+Estados de viaje: Programado, En curso, En pausa, Retrasado, Detenido por incidente, Finalizado y Cancelado.
+
 ## Búsquedas, paginación y reportes
 
 - Todos los listados tienen filtros y paginación de 10 registros por página (`Pageable`).
 - Filtros: DNI, nombre, fecha, ruta y estado, según la pantalla.
 - Reportes en el menú Reportes: viajes (ocupación e ingresos) y pasajeros (asiento, reserva y pasaje). Ambos se pueden exportar a CSV con los filtros aplicados. El archivo se abre en Excel con las tildes correctas.
+- Reporte de pasajeros por viaje: desde el reporte de viajes (botón Pasajeros) o desde el detalle del viaje (Lista de pasajeros). Muestra la ocupación del bus y la lista ordenada por asiento; se puede imprimir o exportar a CSV.
 
 ## Pruebas
 

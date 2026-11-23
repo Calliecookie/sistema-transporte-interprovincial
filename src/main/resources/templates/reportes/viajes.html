@@ -70,7 +70,7 @@
             <div class="contenedor-tabla" th:if="${!pagina.empty}">
                 <table class="tabla">
                     <thead>
-                        <tr><th>N.°</th><th>Ruta</th><th>Salida</th><th>Bus</th><th>Estado</th><th class="centro">Vendidos</th><th class="centro">Reservados</th><th class="centro">Libres</th><th class="derecha">Ingresos</th></tr>
+                        <tr><th>N.°</th><th>Ruta</th><th>Salida</th><th>Bus</th><th>Estado</th><th class="centro">Vendidos</th><th class="centro">Reservados</th><th class="centro">Libres</th><th class="derecha">Ingresos</th><th></th></tr>
                     </thead>
                     <tbody>
                         <tr th:each="fila : ${pagina.content}">
@@ -83,6 +83,7 @@
                             <td class="centro" th:text="${fila.reservados()}"></td>
                             <td class="centro" th:text="${fila.libres()}"></td>
                             <td class="derecha" th:text="${'S/ ' + #numbers.formatDecimal(fila.ingresos(), 1, 'COMMA', 2, 'POINT')}"></td>
+                            <td class="derecha"><a class="boton boton-secundario boton-chico" th:href="@{/reportes/viajes/{id}/pasajeros(id=${fila.viaje().id})}">Pasajeros</a></td>
                         </tr>
                     </tbody>
                 </table>

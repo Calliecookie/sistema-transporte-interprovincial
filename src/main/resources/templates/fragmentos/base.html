@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es-PE" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:fragment="cabecera(titulo)">
+    <meta name="ruta-base" th:content="@{/}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${titulo} + ' | Transportes Andinos'">Transportes Andinos</title>
@@ -16,9 +17,22 @@
         <span class="marca-texto"><strong>Transportes</strong><small>Andinos</small></span>
     </a>
     <nav>
+        <div class="menu-grupo" sec:authorize="hasRole('CONDUCTOR')">
+            <p class="menu-seccion">Conductor</p>
+            <a class="menu-enlace" th:classappend="${activo == 'mis-viajes'} ? 'activo'" th:href="@{/mis-viajes}">
+                <th:block th:replace="~{fragmentos/iconos :: volante}"></th:block><span>Mis viajes</span>
+            </a>
+        </div>
+
+        <div class="menu-grupo" sec:authorize="hasAnyRole('ADMIN', 'VENDEDOR')">
         <p class="menu-seccion">Principal</p>
         <a class="menu-enlace" th:classappend="${activo == 'panel'} ? 'activo'" th:href="@{/}">
             <th:block th:replace="~{fragmentos/iconos :: casa}"></th:block><span>Inicio</span>
+        </a>
+        <a class="menu-enlace" th:classappend="${activo == 'alertas'} ? 'activo'" th:href="@{/alertas}">
+            <th:block th:replace="~{fragmentos/iconos :: aviso}"></th:block><span>Alertas de viaje</span>
+            <span class="insignia-alerta" data-conteo-alertas th:classappend="${alertasPendientes == null or alertasPendientes == 0} ? 'oculto'"
+                  th:text="${alertasPendientes}">0</span>
         </a>
 
         <p class="menu-seccion">Ventas</p>
@@ -37,6 +51,7 @@
         <a class="menu-enlace" th:classappend="${activo == 'reportes'} ? 'activo'" th:href="@{/reportes}">
             <th:block th:replace="~{fragmentos/iconos :: grafico}"></th:block><span>Reportes</span>
         </a>
+        </div>
 
         <div class="menu-grupo" sec:authorize="hasRole('ADMIN')">
             <p class="menu-seccion">Administración</p>
@@ -80,6 +95,9 @@
 </header>
 
 <div th:fragment="mensajes">
+    <a class="alerta alerta-critica" th:if="${alertasPendientes != null and alertasPendientes > 0}" th:href="@{/alertas}"
+       data-aviso-alertas role="alert"
+       th:text="${alertasPendientes == 1 ? 'Hay 1 alerta de viaje sin atender. Haga clic para revisarla.' : 'Hay ' + alertasPendientes + ' alertas de viaje sin atender. Haga clic para revisarlas.'}"></a>
     <div class="alerta alerta-exito" th:if="${mensajeExito}" th:text="${mensajeExito}" role="status"></div>
     <div class="alerta alerta-error" th:if="${mensajeError}" th:text="${mensajeError}" role="alert"></div>
 </div>

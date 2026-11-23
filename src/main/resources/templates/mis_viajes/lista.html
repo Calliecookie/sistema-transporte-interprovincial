@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Mis viajes')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('mis-viajes')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Mis viajes')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel" th:if="${conductor != null}">
+            <div class="panel-cabecera">
+                <div>
+                    <h2 th:text="${conductor.nombreCompleto}"></h2>
+                    <p th:text="${'Licencia ' + conductor.licencia + ' · Categoría ' + conductor.categoriaLicencia}"></p>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel" th:if="${pendientes != null}">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Rutas planificadas</h2>
+                    <p>Viajes asignados que aún no terminan, ordenados por hora de salida.</p>
+                </div>
+            </div>
+            <div class="lista-viajes-conductor" th:if="${!pendientes.empty}">
+                <a class="tarjeta-viaje-conductor" th:each="v : ${pendientes}" th:href="@{/mis-viajes/{id}(id=${v.id})}">
+                    <div class="tarjeta-viaje-cabecera">
+                        <strong th:text="${v.ruta.descripcion}"></strong>
+                        <span class="etiqueta" th:classappend="${'estado-' + v.estado.name().toLowerCase()}" th:text="${v.estado.etiqueta}"></span>
+                    </div>
+                    <dl class="datos datos-compactos">
+                        <div><dt>Salida</dt><dd th:text="${#temporals.format(v.fechaSalida, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                        <div><dt>Llegada estimada</dt><dd th:text="${#temporals.format(v.fechaLlegada, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                        <div><dt>Bus</dt><dd th:text="${v.bus.placa}"></dd></div>
+                        <div><dt>Asientos ocupados</dt><dd th:text="${v.asientosOcupados + ' de ' + v.asientosTotales}"></dd></div>
+                        <div><dt>Terminal de salida</dt><dd th:text="${v.ruta.origen.terminal}"></dd></div>
+                    </dl>
+                </a>
+            </div>
+            <p class="vacio" th:if="${pendientes.empty}">No tiene viajes asignados por ahora.</p>
+        </section>
+
+        <section class="panel" th:if="${recientes != null and !recientes.empty}">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Viajes recientes</h2>
+                </div>
+            </div>
+            <div class="contenedor-tabla">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>N.°</th><th>Ruta</th><th>Salida</th><th>Bus</th><th>Estado</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="v : ${recientes}">
+                            <td th:text="${v.id}"></td>
+                            <td th:text="${v.ruta.descripcion}"></td>
+                            <td th:text="${#temporals.format(v.fechaSalida, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="${v.bus.placa}"></td>
+                            <td><span class="etiqueta" th:classappend="${'estado-' + v.estado.name().toLowerCase()}" th:text="${v.estado.etiqueta}"></span></td>
+                            <td class="derecha"><a class="boton boton-secundario boton-chico" th:href="@{/mis-viajes/{id}(id=${v.id})}">Ver</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

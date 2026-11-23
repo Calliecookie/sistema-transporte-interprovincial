@@ -3,6 +3,7 @@ package pe.transportes.gestion.servicio;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import pe.transportes.gestion.repositorio.ReservaRepositorio;
 import pe.transportes.gestion.repositorio.ViajeRepositorio;
 import pe.transportes.gestion.util.ExportadorCsv;
 import pe.transportes.gestion.util.RangoFechas;
+import pe.transportes.gestion.util.RecursoNoEncontradoException;
 
 @Service
 @PreAuthorize("hasAnyRole('ADMIN', 'VENDEDOR')")
@@ -123,6 +125,47 @@ public class ServicioReporte {
                     pasaje == null ? "" : pasaje.getPrecio().toPlainString(),
                     pasaje == null ? "" : pasaje.getMetodoPago().getEtiqueta(),
                     pasaje == null ? "" : pasaje.getEstado().getEtiqueta());
+        }).toList();
+        return ExportadorCsv.generar(cabeceras, datos);
+    }
+
+    @Transactional(readOnly = true)
+    public Viaje viaje(Long viajeId) {
+        return viajeRepositorio.findById(viajeId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se encontró el viaje solicitado"));
+    }
+
+    @Transactional(readOnly = true)
+    public FilaReporteViaje ocupacionDelViaje(Long viajeId) {
+        return construirFilasViaje(List.of(viaje(viajeId))).get(0);
+    }
+
+    @Transactional(readOnly = true)
+    public List<FilaReportePasajero> pasajerosDelViaje(Long viajeId) {
+        viaje(viajeId);
+        List<Reserva> reservas = reservaRepositorio.findByViajeIdAndEstadoNot(viajeId, EstadoReserva.ANULADA)
+                .stream()
+                .sorted(Comparator.comparing(reserva -> reserva.getAsiento().getNumero()))
+                .toList();
+        return construirFilasPasajero(reservas);
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] csvPasajerosDelViaje(Long viajeId) {
+        List<String> cabeceras = List.of("Asiento", "DNI", "Pasajero", "Teléfono", "Estado de la reserva",
+                "Código del pasaje", "Monto (S/)", "Método de pago");
+        List<List<String>> datos = pasajerosDelViaje(viajeId).stream().map(fila -> {
+            Reserva reserva = fila.reserva();
+            Pasaje pasaje = fila.pasaje();
+            return List.of(
+                    String.valueOf(reserva.getAsiento().getNumero()),
+                    reserva.getPasajero().getDni(),
+                    reserva.getPasajero().getNombreCompleto(),
+                    textoODefecto(reserva.getPasajero().getTelefono()),
+                    reserva.getEstado().getEtiqueta(),
+                    pasaje == null ? "" : pasaje.getCodigo(),
+                    pasaje == null ? "" : pasaje.getPrecio().toPlainString(),
+                    pasaje == null ? "" : pasaje.getMetodoPago().getEtiqueta());
         }).toList();
         return ExportadorCsv.generar(cabeceras, datos);
     }

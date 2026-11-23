@@ -182,8 +182,8 @@ public class ServicioViaje {
     @Transactional
     public Viaje finalizar(Long id) {
         Viaje viaje = obtener(id);
-        if (viaje.getEstado() != EstadoViaje.EN_CURSO) {
-            throw new ReglaNegocioException("Solo se puede finalizar un viaje que está en curso");
+        if (!viaje.getEstado().isEnRuta()) {
+            throw new ReglaNegocioException("Solo se puede finalizar un viaje que está en ruta");
         }
         viaje.setEstado(EstadoViaje.FINALIZADO);
         return viajeRepositorio.save(viaje);

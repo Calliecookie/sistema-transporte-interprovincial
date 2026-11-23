@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Mi viaje')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('mis-viajes')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Mi viaje')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2 th:text="${viaje.ruta.descripcion}"></h2>
+                    <p th:text="${'Viaje N.° ' + viaje.id}"></p>
+                </div>
+                <div class="acciones">
+                    <a class="boton boton-secundario" th:href="@{/mis-viajes}">
+                        <th:block th:replace="~{fragmentos/iconos :: volver}"></th:block>Volver
+                    </a>
+                </div>
+            </div>
+            <dl class="datos">
+                <div><dt>Salida</dt><dd th:text="${#temporals.format(viaje.fechaSalida, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                <div><dt>Llegada estimada</dt><dd th:text="${#temporals.format(viaje.fechaLlegada, 'dd/MM/yyyy HH:mm')}"></dd></div>
+                <div><dt>Estado</dt><dd><span class="etiqueta" th:classappend="${'estado-' + viaje.estado.name().toLowerCase()}" th:text="${viaje.estado.etiqueta}"></span></dd></div>
+                <div><dt>Bus</dt><dd th:text="${viaje.bus.descripcion}"></dd></div>
+                <div><dt>Asientos ocupados</dt><dd th:text="${viaje.asientosOcupados + ' de ' + viaje.asientosTotales}"></dd></div>
+                <div><dt>Asientos libres</dt><dd th:text="${viaje.asientosLibres}"></dd></div>
+                <div><dt>Terminal de salida</dt><dd th:text="${viaje.ruta.origen.terminal}"></dd></div>
+                <div><dt>Terminal de llegada</dt><dd th:text="${viaje.ruta.destino.terminal}"></dd></div>
+            </dl>
+        </section>
+
+        <section class="panel" th:if="${viaje.estado.name() == 'PROGRAMADO' or viaje.estado.enRuta}">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Acciones del viaje</h2>
+                    <p>Cada acción queda registrada y las alertas llegan al administrador y a los vendedores.</p>
+                </div>
+            </div>
+
+            <div class="rejilla-acciones-conductor">
+                <form class="tarjeta-accion" th:if="${viaje.estado.name() == 'PROGRAMADO'}" th:action="@{/mis-viajes/{id}/iniciar(id=${viaje.id})}" method="post"
+                      data-confirmar="¿Confirmar la salida del viaje?">
+                    <h3>Iniciar viaje</h3>
+                    <textarea name="comentario" maxlength="500" rows="2" placeholder="Comentario opcional"></textarea>
+                    <button class="boton boton-primario" type="submit">Registrar salida</button>
+                </form>
+
+                <form class="tarjeta-accion" th:if="${viaje.estado.enRuta and viaje.estado.name() != 'EN_PAUSA'}" th:action="@{/mis-viajes/{id}/pausar(id=${viaje.id})}" method="post">
+                    <h3>Pausar viaje</h3>
+                    <textarea name="comentario" maxlength="500" rows="2" placeholder="Motivo de la pausa (obligatorio)" required></textarea>
+                    <button class="boton boton-secundario" type="submit">Pausar</button>
+                </form>
+
+                <form class="tarjeta-accion" th:if="${viaje.estado.enRuta and viaje.estado.name() != 'EN_CURSO'}" th:action="@{/mis-viajes/{id}/reanudar(id=${viaje.id})}" method="post">
+                    <h3>Reanudar viaje</h3>
+                    <textarea name="comentario" maxlength="500" rows="2" placeholder="Comentario opcional"></textarea>
+                    <button class="boton boton-primario" type="submit">Reanudar</button>
+                </form>
+
+                <form class="tarjeta-accion" th:if="${viaje.estado.enRuta}" th:action="@{/mis-viajes/{id}/retraso(id=${viaje.id})}" method="post">
+                    <h3>Reportar retraso</h3>
+                    <input type="number" name="minutos" min="1" max="1440" placeholder="Minutos de retraso" required>
+                    <textarea name="comentario" maxlength="500" rows="2" placeholder="Motivo del retraso (obligatorio)" required></textarea>
+                    <button class="boton boton-secundario" type="submit">Reportar retraso</button>
+                </form>
+
+                <form class="tarjeta-accion" th:if="${viaje.estado.enRuta}" th:action="@{/mis-viajes/{id}/observacion(id=${viaje.id})}" method="post">
+                    <h3>Observación</h3>
+                    <textarea name="comentario" maxlength="500" rows="2" placeholder="Comentario u observación del viaje" required></textarea>
+                    <button class="boton boton-secundario" type="submit">Guardar observación</button>
+                </form>
+
+                <form class="tarjeta-accion" th:if="${viaje.estado.enRuta and viaje.estado.name() != 'INCIDENTE'}" th:action="@{/mis-viajes/{id}/finalizar(id=${viaje.id})}" method="post"
+                      data-confirmar="¿Confirmar la llegada a destino?">
+                    <h3>Llegada a destino</h3>
+                    <textarea name="comentario" maxlength="500" rows="2" placeholder="Comentario opcional"></textarea>
+                    <button class="boton boton-primario" type="submit">Confirmar llegada</button>
+                </form>
+
+                <form class="tarjeta-accion tarjeta-accion-peligro" th:if="${viaje.estado.enRuta}" th:action="@{/mis-viajes/{id}/accidente(id=${viaje.id})}" method="post"
+                      data-confirmar="¿Enviar alerta de ACCIDENTE a la oficina?">
+                    <h3>Reportar accidente</h3>
+                    <textarea name="comentario" maxlength="500" rows="2" placeholder="Qué pasó, ubicación y si hay heridos (obligatorio)" required></textarea>
+                    <button class="boton boton-peligro" type="submit">Enviar alerta de accidente</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Lista de pasajeros</h2>
+                    <p th:text="${pasajeros.size() + ' pasajeros con asiento reservado o vendido'}"></p>
+                </div>
+            </div>
+            <div class="contenedor-tabla" th:if="${!pasajeros.empty}">
+                <table class="tabla">
+                    <thead>
+                        <tr><th class="centro">Asiento</th><th>DNI</th><th>Pasajero</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${pasajeros}">
+                            <td class="centro" th:text="${r.asiento.numero}"></td>
+                            <td th:text="${r.pasajero.dni}"></td>
+                            <td th:text="${r.pasajero.nombreCompleto}"></td>
+                            <td><span class="etiqueta" th:classappend="${'estado-' + r.estado.name().toLowerCase()}" th:text="${r.estado.etiqueta}"></span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="vacio" th:if="${pasajeros.empty}">Este viaje aún no tiene pasajeros.</p>
+        </section>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Bitácora del viaje</h2>
+                </div>
+            </div>
+            <ul class="bitacora" th:if="${!incidencias.empty}">
+                <li th:each="i : ${incidencias}" th:classappend="${i.tipo.alerta} ? 'bitacora-alerta'">
+                    <strong th:text="${i.tipo.etiqueta}"></strong>
+                    <span th:if="${i.minutosRetraso != null}" th:text="${'(' + i.minutosRetraso + ' min)'}"></span>
+                    <small th:text="${#temporals.format(i.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></small>
+                    <p th:if="${i.descripcion != null}" th:text="${i.descripcion}"></p>
+                </li>
+            </ul>
+            <p class="vacio" th:if="${incidencias.empty}">Todavía no hay registros en este viaje.</p>
+        </section>
+    </main>
+</div>
+</body>
+</html>

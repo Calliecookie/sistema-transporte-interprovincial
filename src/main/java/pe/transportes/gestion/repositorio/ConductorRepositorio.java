@@ -1,6 +1,7 @@
 package pe.transportes.gestion.repositorio;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import pe.transportes.gestion.modelo.Conductor;
@@ -18,4 +19,8 @@ public interface ConductorRepositorio extends JpaRepository<Conductor, Long>, Jp
     List<Conductor> findByActivoTrueOrderByApellidosAscNombresAsc();
 
     long countByActivoTrue();
+
+    Optional<Conductor> findFirstByActivoTrueOrderByIdAsc();
+
+    Optional<Conductor> findByDni(String dni);
 }
