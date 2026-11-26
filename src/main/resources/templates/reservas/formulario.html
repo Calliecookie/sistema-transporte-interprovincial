@@ -29,11 +29,81 @@
                     <div class="campo ancho-completo" th:classappend="${#fields.hasErrors('dni')} ? 'con-error'">
                         <label for="dni">DNI del pasajero</label>
                         <input type="text" th:field="*{dni}" maxlength="8" inputmode="numeric" pattern="\d{8}"
-                               title="Ingrese los 8 dígitos del DNI" placeholder="8 dígitos" required autofocus>
-                        <span class="ayuda">¿El pasajero no está registrado? <a th:href="@{/pasajeros/nuevo}">Registrarlo ahora</a>.</span>
+                               title="Ingrese los 8 dígitos del DNI" placeholder="8 dígitos" required autofocus data-consulta-dni="pasajero">
+                        <span class="ayuda" data-estado-dni>Si el DNI no está registrado, el pasajero se registra automáticamente al confirmar. Al escribir el DNI se completan sus datos.</span>
                         <span class="error-campo" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></span>
                     </div>
 
+                </div>
+
+                <div class="subtitulo-formulario">Datos del pasajero</div>
+                <div class="rejilla-2" data-bloque-pasajero>
+                <div class="campo" th:classappend="${#fields.hasErrors('pasajero.nombres')} ? 'con-error'">
+                    <label for="pasajero.nombres">Nombres</label>
+                    <input type="text" th:field="*{pasajero.nombres}" maxlength="80" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.nombres')}" th:errors="*{pasajero.nombres}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('pasajero.apellidoPaterno')} ? 'con-error'">
+                    <label for="pasajero.apellidoPaterno">Apellido paterno</label>
+                    <input type="text" th:field="*{pasajero.apellidoPaterno}" maxlength="39" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.apellidoPaterno')}" th:errors="*{pasajero.apellidoPaterno}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('pasajero.apellidoMaterno')} ? 'con-error'">
+                    <label for="pasajero.apellidoMaterno">Apellido materno</label>
+                    <input type="text" th:field="*{pasajero.apellidoMaterno}" maxlength="39">
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.apellidoMaterno')}" th:errors="*{pasajero.apellidoMaterno}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('pasajero.sexo')} ? 'con-error'">
+                    <label for="pasajero.sexo">Sexo</label>
+                    <select th:field="*{pasajero.sexo}">
+                        <option value="">Sin especificar</option>
+                        <option th:each="s : ${sexos}" th:value="${s.name()}" th:text="${s.etiqueta}"></option>
+                    </select>
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.sexo')}" th:errors="*{pasajero.sexo}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('pasajero.fechaNacimiento')} ? 'con-error'">
+                    <label for="pasajero.fechaNacimiento">Fecha de nacimiento</label>
+                    <input type="date" th:field="*{pasajero.fechaNacimiento}">
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.fechaNacimiento')}" th:errors="*{pasajero.fechaNacimiento}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('pasajero.telefono')} ? 'con-error'">
+                    <label for="pasajero.telefono">Teléfono celular</label>
+                    <input type="text" th:field="*{pasajero.telefono}" maxlength="9" inputmode="numeric" pattern="9\d{8}" title="Ingrese 9 dígitos que empiecen con 9" placeholder="9XXXXXXXX">
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.telefono')}" th:errors="*{pasajero.telefono}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('pasajero.correo')} ? 'con-error'">
+                    <label for="pasajero.correo">Correo electrónico</label>
+                    <input type="email" th:field="*{pasajero.correo}" maxlength="100" placeholder="nombre@correo.pe">
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.correo')}" th:errors="*{pasajero.correo}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('pasajero.departamento')} ? 'con-error'">
+                    <label for="pasajero.departamento">Departamento</label>
+                    <input type="text" th:field="*{pasajero.departamento}" maxlength="60">
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.departamento')}" th:errors="*{pasajero.departamento}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('pasajero.provincia')} ? 'con-error'">
+                    <label for="pasajero.provincia">Provincia</label>
+                    <input type="text" th:field="*{pasajero.provincia}" maxlength="60">
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.provincia')}" th:errors="*{pasajero.provincia}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('pasajero.distrito')} ? 'con-error'">
+                    <label for="pasajero.distrito">Distrito</label>
+                    <input type="text" th:field="*{pasajero.distrito}" maxlength="60">
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.distrito')}" th:errors="*{pasajero.distrito}"></span>
+                </div>
+                <div class="campo ancho-completo" th:classappend="${#fields.hasErrors('pasajero.direccion')} ? 'con-error'">
+                    <label for="pasajero.direccion">Dirección</label>
+                    <input type="text" th:field="*{pasajero.direccion}" maxlength="150">
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.direccion')}" th:errors="*{pasajero.direccion}"></span>
+                </div>
+                <div class="campo ancho-completo" th:classappend="${#fields.hasErrors('pasajero.direccionCompleta')} ? 'con-error'">
+                    <label for="pasajero.direccionCompleta">Dirección completa</label>
+                    <input type="text" th:field="*{pasajero.direccionCompleta}" maxlength="250">
+                    <span class="error-campo" th:if="${#fields.hasErrors('pasajero.direccionCompleta')}" th:errors="*{pasajero.direccionCompleta}"></span>
+                </div>
+                </div>
+
+                <div class="rejilla-2">
                     <div class="campo ancho-completo" th:classappend="${#fields.hasErrors('accion')} ? 'con-error'">
                         <span class="etiqueta-campo">¿Qué desea hacer?</span>
                         <div class="opciones-radio">

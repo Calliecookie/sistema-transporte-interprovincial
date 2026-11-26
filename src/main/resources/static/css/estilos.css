@@ -1480,3 +1480,17 @@ input.consultando {
     text-align: center;
     font-size: 0.9rem;
 }
+
+.subtitulo-formulario {
+    margin: 18px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--gris-200);
+    color: var(--azul-800);
+    font-weight: 700;
+}
+
+.campo input:disabled,
+.campo select:disabled {
+    background: var(--gris-100);
+    color: var(--gris-700);
+}

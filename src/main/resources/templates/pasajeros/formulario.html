@@ -22,31 +22,68 @@
                     <span class="ayuda" data-estado-dni>Al ingresar los 8 dígitos se completan los nombres, apellidos y la fecha de nacimiento.</span>
                     <span class="error-campo" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></span>
                 </div>
-                <div class="campo" th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'con-error'">
-                    <label for="fechaNacimiento">Fecha de nacimiento</label>
-                    <input type="date" th:field="*{fechaNacimiento}">
-                    <span class="error-campo" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}"></span>
-                </div>
                 <div class="campo" th:classappend="${#fields.hasErrors('nombres')} ? 'con-error'">
                     <label for="nombres">Nombres</label>
                     <input type="text" th:field="*{nombres}" maxlength="80" required>
                     <span class="error-campo" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></span>
                 </div>
-                <div class="campo" th:classappend="${#fields.hasErrors('apellidos')} ? 'con-error'">
-                    <label for="apellidos">Apellidos</label>
-                    <input type="text" th:field="*{apellidos}" maxlength="80" required>
-                    <span class="error-campo" th:if="${#fields.hasErrors('apellidos')}" th:errors="*{apellidos}"></span>
+                <div class="campo" th:classappend="${#fields.hasErrors('apellidoPaterno')} ? 'con-error'">
+                    <label for="apellidoPaterno">Apellido paterno</label>
+                    <input type="text" th:field="*{apellidoPaterno}" maxlength="39" required>
+                    <span class="error-campo" th:if="${#fields.hasErrors('apellidoPaterno')}" th:errors="*{apellidoPaterno}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('apellidoMaterno')} ? 'con-error'">
+                    <label for="apellidoMaterno">Apellido materno</label>
+                    <input type="text" th:field="*{apellidoMaterno}" maxlength="39">
+                    <span class="error-campo" th:if="${#fields.hasErrors('apellidoMaterno')}" th:errors="*{apellidoMaterno}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('sexo')} ? 'con-error'">
+                    <label for="sexo">Sexo</label>
+                    <select th:field="*{sexo}">
+                        <option value="">Sin especificar</option>
+                        <option th:each="s : ${sexos}" th:value="${s.name()}" th:text="${s.etiqueta}"></option>
+                    </select>
+                    <span class="error-campo" th:if="${#fields.hasErrors('sexo')}" th:errors="*{sexo}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'con-error'">
+                    <label for="fechaNacimiento">Fecha de nacimiento</label>
+                    <input type="date" th:field="*{fechaNacimiento}">
+                    <span class="error-campo" th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}"></span>
                 </div>
                 <div class="campo" th:classappend="${#fields.hasErrors('telefono')} ? 'con-error'">
                     <label for="telefono">Teléfono celular</label>
-                    <input type="text" th:field="*{telefono}" maxlength="9" inputmode="numeric" pattern="9\d{8}"
-                           title="Ingrese 9 dígitos que empiecen con 9" placeholder="9XXXXXXXX">
+                    <input type="text" th:field="*{telefono}" maxlength="9" inputmode="numeric" pattern="9\d{8}" title="Ingrese 9 dígitos que empiecen con 9" placeholder="9XXXXXXXX">
                     <span class="error-campo" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></span>
                 </div>
                 <div class="campo" th:classappend="${#fields.hasErrors('correo')} ? 'con-error'">
                     <label for="correo">Correo electrónico</label>
                     <input type="email" th:field="*{correo}" maxlength="100" placeholder="nombre@correo.pe">
                     <span class="error-campo" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('departamento')} ? 'con-error'">
+                    <label for="departamento">Departamento</label>
+                    <input type="text" th:field="*{departamento}" maxlength="60">
+                    <span class="error-campo" th:if="${#fields.hasErrors('departamento')}" th:errors="*{departamento}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('provincia')} ? 'con-error'">
+                    <label for="provincia">Provincia</label>
+                    <input type="text" th:field="*{provincia}" maxlength="60">
+                    <span class="error-campo" th:if="${#fields.hasErrors('provincia')}" th:errors="*{provincia}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('distrito')} ? 'con-error'">
+                    <label for="distrito">Distrito</label>
+                    <input type="text" th:field="*{distrito}" maxlength="60">
+                    <span class="error-campo" th:if="${#fields.hasErrors('distrito')}" th:errors="*{distrito}"></span>
+                </div>
+                <div class="campo ancho-completo" th:classappend="${#fields.hasErrors('direccion')} ? 'con-error'">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" th:field="*{direccion}" maxlength="150">
+                    <span class="error-campo" th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}"></span>
+                </div>
+                <div class="campo ancho-completo" th:classappend="${#fields.hasErrors('direccionCompleta')} ? 'con-error'">
+                    <label for="direccionCompleta">Dirección completa</label>
+                    <input type="text" th:field="*{direccionCompleta}" maxlength="250">
+                    <span class="error-campo" th:if="${#fields.hasErrors('direccionCompleta')}" th:errors="*{direccionCompleta}"></span>
                 </div>
             </div>
 

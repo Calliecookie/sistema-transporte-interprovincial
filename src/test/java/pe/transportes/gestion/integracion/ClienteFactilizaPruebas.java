@@ -42,6 +42,24 @@ class ClienteFactilizaPruebas {
     }
 
     @Test
+    void leeUbicacionDireccionYSexo() throws Exception {
+        String cuerpo = "{\"success\":true,\"data\":{\"nombres\":\"JOSE PEDRO\",\"apellido_paterno\":\"CASTILLO\","
+                + "\"apellido_materno\":\"TERRONES\",\"departamento\":\"CAJAMARCA\",\"provincia\":\"CHOTA\","
+                + "\"distrito\":\"TACABAMBA\",\"direccion\":\"CASERIO PUÑA\","
+                + "\"direccion_completa\":\"CASERIO PUÑA, CAJAMARCA - CHOTA - TACABAMBA\",\"sexo\":\"M\"}}";
+
+        PersonaDni persona = cliente.interpretar(200, cuerpo, "27427864").get();
+
+        assertThat(persona.departamento()).isEqualTo("CAJAMARCA");
+        assertThat(persona.provincia()).isEqualTo("CHOTA");
+        assertThat(persona.distrito()).isEqualTo("TACABAMBA");
+        assertThat(persona.direccion()).isEqualTo("CASERIO PUÑA");
+        assertThat(persona.direccionCompleta()).contains("TACABAMBA");
+        assertThat(persona.sexo()).isEqualTo(pe.transportes.gestion.modelo.Sexo.MASCULINO);
+        assertThat(persona.fechaNacimiento()).isNull();
+    }
+
+    @Test
     void devuelveVacioCuandoNoExisteElDni() throws Exception {
         assertThat(cliente.interpretar(404, "", "12345678")).isEmpty();
         assertThat(cliente.interpretar(200, "{\"success\":false}", "12345678")).isEmpty();

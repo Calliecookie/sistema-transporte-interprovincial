@@ -23,12 +23,21 @@ CREATE TABLE pasajero (
     id BIGINT NOT NULL AUTO_INCREMENT,
     dni VARCHAR(8) NOT NULL,
     nombres VARCHAR(80) NOT NULL,
+    apellido_paterno VARCHAR(39) NULL,
+    apellido_materno VARCHAR(39) NULL,
     apellidos VARCHAR(80) NOT NULL,
     telefono VARCHAR(9) NULL,
     correo VARCHAR(100) NULL,
     fecha_nacimiento DATE NULL,
+    sexo VARCHAR(10) NULL,
+    departamento VARCHAR(60) NULL,
+    provincia VARCHAR(60) NULL,
+    distrito VARCHAR(60) NULL,
+    direccion VARCHAR(150) NULL,
+    direccion_completa VARCHAR(250) NULL,
     PRIMARY KEY (id),
     CONSTRAINT uq_pasajero_dni UNIQUE (dni),
+    CONSTRAINT ck_pasajero_sexo CHECK (sexo IS NULL OR sexo IN ('MASCULINO', 'FEMENINO')),
     CONSTRAINT ck_pasajero_dni CHECK (dni REGEXP '^[0-9]{8}$'),
     CONSTRAINT ck_pasajero_telefono CHECK (telefono IS NULL OR telefono REGEXP '^9[0-9]{8}$')
 ) ENGINE=InnoDB;
@@ -291,6 +300,11 @@ INSERT INTO pasajero (id, dni, nombres, apellidos, telefono, correo, fecha_nacim
 (18, '73654021', 'Milagros del Pilar', 'Soto Zevallos', '987412365', NULL, '1994-11-24'),
 (19, '44825671', 'Óscar Daniel', 'Ponce Cabrera', '952147893', 'oscar.ponce@correo.pe', '1985-05-02'),
 (20, '74309158', 'Natalia Beatriz', 'Espinoza Linares', '961478523', 'natalia.espinoza@correo.pe', '2003-08-15');
+
+UPDATE pasajero
+SET apellido_paterno = SUBSTRING_INDEX(apellidos, ' ', 1),
+    apellido_materno = CASE WHEN LOCATE(' ', apellidos) > 0 THEN TRIM(SUBSTRING(apellidos, LOCATE(' ', apellidos) + 1)) ELSE NULL END
+WHERE apellido_paterno IS NULL;
 
 INSERT INTO viaje (id, ruta_id, bus_id, conductor_id, fecha_salida, fecha_llegada, precio, estado)
 SELECT p.id, p.ruta_id, p.bus_id, p.conductor_id, p.salida,

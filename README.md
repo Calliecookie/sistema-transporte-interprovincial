@@ -17,7 +17,7 @@ Caso propuesto Nro. 7. Aplicación web para administrar buses, conductores, ruta
 2. Abra el archivo `base_datos/transporte_interprovincial.sql` (menú File > Open SQL Script).
 3. Ejecute todo el script de una sola vez con el icono del rayo.
 4. Si la base `transporte_interprovincial` ya existía, el script la elimina y la vuelve a crear con los datos de prueba.
-5. Si prefiere conservar los datos de una instalación anterior, ejecute solo los scripts de actualización que le falten, en orden: `actualizacion_1_1_0.sql` y luego `actualizacion_1_2_0.sql`.
+5. Si prefiere conservar los datos de una instalación anterior, ejecute solo los scripts de actualización que le falten, en orden: `actualizacion_1_1_0.sql`, `actualizacion_1_2_0.sql` y `actualizacion_1_3_0.sql`.
 
 ### 2. Abrir el proyecto en NetBeans
 
@@ -120,6 +120,7 @@ Recomendaciones: formato JPG, menos de 400 KB cada una (calidad 75 a 80), y pref
 base_datos/                      script SQL con las tablas y los datos de prueba
 base_datos/actualizacion_1_1_0.sql  actualiza una base de la versión 1.0 a la 1.1
 base_datos/actualizacion_1_2_0.sql  actualiza una base de la versión 1.1 a la 1.2
+base_datos/actualizacion_1_3_0.sql  actualiza una base de la versión 1.2 a la 1.3
 src/main/java/pe/transportes/gestion
     modelo/                      entidades JPA, enumeraciones y formularios
     repositorio/                 interfaces Spring Data y especificaciones de filtros

@@ -27,9 +27,15 @@ public class ConfiguracionSeguridad {
         return new BCryptPasswordEncoder();
     }
 
-    private AuthorizationManager<RequestAuthorizationContext> modulo(ServicioPermisos permisos, Modulo modulo) {
-        return (autenticacion, contexto) -> new AuthorizationDecision(
-                permisos.permite(autenticacion.get(), modulo));
+    private AuthorizationManager<RequestAuthorizationContext> modulo(ServicioPermisos permisos, Modulo... modulos) {
+        return (autenticacion, contexto) -> {
+            for (Modulo modulo : modulos) {
+                if (permisos.permite(autenticacion.get(), modulo)) {
+                    return new AuthorizationDecision(true);
+                }
+            }
+            return new AuthorizationDecision(false);
+        };
     }
 
     @Bean
@@ -45,8 +51,9 @@ public class ConfiguracionSeguridad {
                         .requestMatchers("/").hasAnyRole("ADMIN", "VENDEDOR", "CONDUCTOR")
                         .requestMatchers("/consultas/dni/conductor/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/pasajeros/*/eliminar").hasRole("ADMIN")
-                        .requestMatchers("/pasajeros/**", "/consultas/dni/pasajero/**")
-                        .access(modulo(permisos, Modulo.PASAJEROS))
+                        .requestMatchers("/consultas/dni/pasajero/**")
+                        .access(modulo(permisos, Modulo.PASAJEROS, Modulo.VENTAS))
+                        .requestMatchers("/pasajeros/**").access(modulo(permisos, Modulo.PASAJEROS))
                         .requestMatchers("/reservas/**").access(modulo(permisos, Modulo.VENTAS))
                         .requestMatchers("/pasajes/**").access(modulo(permisos, Modulo.PASAJES))
                         .requestMatchers("/reportes/**").access(modulo(permisos, Modulo.REPORTES))

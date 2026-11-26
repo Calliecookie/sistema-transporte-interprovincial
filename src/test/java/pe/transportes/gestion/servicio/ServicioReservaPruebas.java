@@ -161,6 +161,41 @@ class ServicioReservaPruebas {
     }
 
     @Test
+    void registraAlPasajeroAutomaticamenteSiElDniNoExiste() {
+        when(pasajeroRepositorio.findByDni("12345678")).thenReturn(Optional.empty());
+        when(pasajeroRepositorio.save(any(Pasajero.class))).thenAnswer(invocacion -> {
+            Pasajero nuevo = invocacion.getArgument(0);
+            nuevo.setId(99L);
+            return nuevo;
+        });
+        asiento(10L, 3, EstadoAsiento.LIBRE);
+        FormularioReserva formulario = formulario(10L, AccionReserva.RESERVAR, null);
+        formulario.setDni("12345678");
+        formulario.getPasajero().setNombres("Ana");
+        formulario.getPasajero().setApellidoPaterno("Pérez");
+        formulario.getPasajero().setApellidoMaterno("Quispe");
+        formulario.getPasajero().setDistrito("Miraflores");
+
+        Reserva reserva = servicio.registrar(formulario);
+
+        ArgumentCaptor<Pasajero> captor = ArgumentCaptor.forClass(Pasajero.class);
+        verify(pasajeroRepositorio).save(captor.capture());
+        assertThat(captor.getValue().getDni()).isEqualTo("12345678");
+        assertThat(captor.getValue().getApellidos()).isEqualTo("Pérez Quispe");
+        assertThat(captor.getValue().getDistrito()).isEqualTo("Miraflores");
+        assertThat(reserva.getPasajero().getId()).isEqualTo(99L);
+    }
+
+    @Test
+    void conUnDniYaRegistradoNoCreaOtroPasajero() {
+        asiento(10L, 4, EstadoAsiento.LIBRE);
+
+        servicio.registrar(formulario(10L, AccionReserva.RESERVAR, null));
+
+        verify(pasajeroRepositorio, never()).save(any(Pasajero.class));
+    }
+
+    @Test
     void exigeElMetodoDePagoCuandoSeVende() {
         asiento(10L, 5, EstadoAsiento.LIBRE);
 

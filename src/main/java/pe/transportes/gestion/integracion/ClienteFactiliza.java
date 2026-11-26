@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import pe.transportes.gestion.modelo.Sexo;
 
 @Component
 public class ClienteFactiliza {
@@ -80,7 +81,14 @@ public class ClienteFactiliza {
         }
         return Optional.of(new PersonaDni(dni, nombres, datos.path("apellido_paterno").asText("").strip(),
                 datos.path("apellido_materno").asText("").strip(),
-                leerFecha(datos.path("fecha_nacimiento").asText(""))));
+                leerFecha(datos.path("fecha_nacimiento").asText("")), texto(datos, "departamento"),
+                texto(datos, "provincia"), texto(datos, "distrito"), texto(datos, "direccion"),
+                texto(datos, "direccion_completa"), Sexo.desde(datos.path("sexo").asText(""))));
+    }
+
+    private static String texto(JsonNode datos, String clave) {
+        String valor = datos.path(clave).asText("").strip();
+        return valor.isEmpty() ? null : valor;
     }
 
     static LocalDate leerFecha(String texto) {

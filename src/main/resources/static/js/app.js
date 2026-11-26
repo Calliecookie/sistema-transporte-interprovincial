@@ -47,15 +47,20 @@ document.addEventListener('DOMContentLoaded', function () {
     var meta = document.querySelector('meta[name="ruta-base"]');
     var base = meta ? meta.getAttribute('content') : '/';
 
+    var CLAVES = ['nombres', 'apellidoPaterno', 'apellidoMaterno', 'apellidos', 'departamento', 'provincia',
+        'distrito', 'direccion', 'direccionCompleta', 'fechaNacimiento', 'sexo', 'telefono', 'correo'];
+
     document.querySelectorAll('input[data-consulta-dni]').forEach(function (campo) {
         var tipo = campo.getAttribute('data-consulta-dni');
         var formulario = campo.form;
         var estado = campo.parentElement.querySelector('[data-estado-dni]');
-        var nombres = formulario.querySelector('[name="nombres"]');
-        var apellidos = formulario.querySelector('[name="apellidos"]');
-        var nacimiento = formulario.querySelector('[name="fechaNacimiento"]');
+        var bloque = formulario.querySelector('[data-bloque-pasajero]');
         var inicial = campo.value;
         var ultimo = '';
+
+        var buscar = function (clave) {
+            return formulario.querySelector('[name="' + clave + '"], [name="pasajero.' + clave + '"]');
+        };
 
         var mostrar = function (texto, clase) {
             if (!estado) {
@@ -68,10 +73,51 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
 
+        var bloquear = function (bloquear) {
+            if (!bloque) {
+                return;
+            }
+            bloque.querySelectorAll('input, select').forEach(function (elemento) {
+                if (bloquear) {
+                    elemento.setAttribute('data-era-obligatorio', elemento.required ? '1' : '0');
+                    elemento.required = false;
+                    elemento.disabled = true;
+                } else {
+                    elemento.disabled = false;
+                    elemento.required = elemento.getAttribute('data-era-obligatorio') === '1';
+                }
+            });
+        };
+
+        var limpiar = function () {
+            if (!bloque) {
+                return;
+            }
+            bloque.querySelectorAll('input, select').forEach(function (elemento) {
+                elemento.value = '';
+            });
+        };
+
+        var rellenar = function (datos) {
+            CLAVES.forEach(function (clave) {
+                var elemento = buscar(clave);
+                if (elemento && datos[clave]) {
+                    elemento.value = datos[clave];
+                }
+            });
+        };
+
         campo.addEventListener('input', function () {
             campo.value = campo.value.replace(/\D/g, '').slice(0, 8);
             var dni = campo.value;
-            if (dni.length !== 8 || dni === ultimo || (inicial && dni === inicial)) {
+            if (dni.length !== 8) {
+                if (ultimo) {
+                    bloquear(false);
+                    ultimo = '';
+                }
+                return;
+            }
+            if (dni === ultimo || (inicial && dni === inicial)) {
                 return;
             }
             ultimo = dni;
@@ -82,24 +128,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     return respuesta.json();
                 })
                 .then(function (datos) {
-                    if (datos.encontrado && !datos.registrado) {
-                        if (nombres) {
-                            nombres.value = datos.nombres;
+                    bloquear(false);
+                    if (datos.encontrado && datos.registrado) {
+                        limpiar();
+                        rellenar(datos);
+                        if (tipo === 'pasajero' && bloque) {
+                            bloquear(true);
+                            mostrar(datos.mensaje, 'dni-aviso');
+                        } else {
+                            mostrar('Este DNI ya está registrado: ' + datos.nombres + ' ' + datos.apellidos, 'dni-aviso');
                         }
-                        if (apellidos) {
-                            apellidos.value = datos.apellidos;
-                        }
-                        if (nacimiento && datos.fechaNacimiento) {
-                            nacimiento.value = datos.fechaNacimiento;
-                        }
+                    } else if (datos.encontrado) {
+                        limpiar();
+                        rellenar(datos);
                         mostrar(datos.mensaje, 'dni-ok');
-                    } else if (datos.registrado) {
-                        mostrar(datos.mensaje + ': ' + datos.nombres + ' ' + datos.apellidos, 'dni-aviso');
                     } else {
                         mostrar(datos.mensaje, 'dni-error');
                     }
                 })
                 .catch(function () {
+                    bloquear(false);
                     mostrar('No se pudo consultar el DNI. Ingrese los datos manualmente', 'dni-error');
                 })
                 .finally(function () {

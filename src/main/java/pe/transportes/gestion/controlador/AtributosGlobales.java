@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import pe.transportes.gestion.modelo.Modulo;
+import pe.transportes.gestion.modelo.Sexo;
 import pe.transportes.gestion.seguridad.ServicioPermisos;
 import pe.transportes.gestion.servicio.ServicioAlerta;
 
@@ -26,6 +27,11 @@ public class AtributosGlobales {
         this.reloj = reloj;
         this.servicioAlerta = servicioAlerta;
         this.permisos = permisos;
+    }
+
+    @ModelAttribute("sexos")
+    public Sexo[] sexos() {
+        return Sexo.values();
     }
 
     @ModelAttribute("modulosPermitidos")

@@ -91,7 +91,15 @@ public class ServicioPasajero {
     private void copiar(Pasajero datos, Pasajero pasajero) {
         pasajero.setDni(datos.getDni());
         pasajero.setNombres(datos.getNombres());
+        pasajero.setApellidoPaterno(datos.getApellidoPaterno());
+        pasajero.setApellidoMaterno(datos.getApellidoMaterno());
         pasajero.setApellidos(datos.getApellidos());
+        pasajero.setDepartamento(datos.getDepartamento());
+        pasajero.setProvincia(datos.getProvincia());
+        pasajero.setDistrito(datos.getDistrito());
+        pasajero.setDireccion(datos.getDireccion());
+        pasajero.setDireccionCompleta(datos.getDireccionCompleta());
+        pasajero.setSexo(datos.getSexo());
         pasajero.setTelefono(datos.getTelefono());
         pasajero.setCorreo(datos.getCorreo());
         pasajero.setFechaNacimiento(datos.getFechaNacimiento());

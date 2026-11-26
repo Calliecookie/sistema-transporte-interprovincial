@@ -29,9 +29,8 @@ public class ServicioConsultaDni {
         validar(dni);
         Optional<Pasajero> existente = pasajeroRepositorio.findByDni(dni);
         if (existente.isPresent()) {
-            Pasajero pasajero = existente.get();
-            return ResultadoConsultaDni.yaRegistrado(pasajero.getNombres(), pasajero.getApellidos(),
-                    "Este DNI ya está registrado como pasajero");
+            return ResultadoConsultaDni.yaRegistrado(existente.get(),
+                    "Pasajero ya registrado: se usarán sus datos guardados");
         }
         return consultarExterno(dni);
     }

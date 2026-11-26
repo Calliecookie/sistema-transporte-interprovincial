@@ -21,6 +21,16 @@ public class FormularioReserva {
 
     private MetodoPago metodoPago;
 
+    private Pasajero pasajero = new Pasajero();
+
+    public Pasajero getPasajero() {
+        return pasajero;
+    }
+
+    public void setPasajero(Pasajero pasajero) {
+        this.pasajero = pasajero;
+    }
+
     public Long getViajeId() {
         return viajeId;
     }

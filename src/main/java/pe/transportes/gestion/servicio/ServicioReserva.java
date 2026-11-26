@@ -119,6 +119,31 @@ public class ServicioReserva {
         return asiento;
     }
 
+    private Pasajero registrarPasajero(FormularioReserva formulario) {
+        Pasajero datos = formulario.getPasajero() == null ? new Pasajero() : formulario.getPasajero();
+        Pasajero nuevo = new Pasajero();
+        nuevo.setDni(formulario.getDni());
+        nuevo.setNombres(datos.getNombres());
+        nuevo.setApellidoPaterno(datos.getApellidoPaterno());
+        nuevo.setApellidoMaterno(datos.getApellidoMaterno());
+        nuevo.setTelefono(datos.getTelefono());
+        nuevo.setCorreo(datos.getCorreo());
+        nuevo.setFechaNacimiento(datos.getFechaNacimiento());
+        nuevo.setDepartamento(datos.getDepartamento());
+        nuevo.setProvincia(datos.getProvincia());
+        nuevo.setDistrito(datos.getDistrito());
+        nuevo.setDireccion(datos.getDireccion());
+        nuevo.setDireccionCompleta(datos.getDireccionCompleta());
+        nuevo.setSexo(datos.getSexo());
+        try {
+            validador.validar(nuevo);
+        } catch (ReglaNegocioException excepcion) {
+            String campo = excepcion.getCampo() == null ? null : "pasajero." + excepcion.getCampo();
+            throw new ReglaNegocioException(campo, excepcion.getMessage());
+        }
+        return pasajeroRepositorio.save(nuevo);
+    }
+
     @Transactional
     public Reserva registrar(FormularioReserva formulario) {
         validador.validar(formulario);
@@ -132,7 +157,7 @@ public class ServicioReserva {
             throw new ReglaNegocioException("El viaje ya no admite reservas ni ventas");
         }
         Pasajero pasajero = pasajeroRepositorio.findByDni(formulario.getDni())
-                .orElseThrow(() -> new ReglaNegocioException("dni", "No existe un pasajero registrado con ese DNI"));
+                .orElseGet(() -> registrarPasajero(formulario));
         if (reservaRepositorio.existsByViajeIdAndPasajeroIdAndEstadoNot(viaje.getId(), pasajero.getId(),
                 EstadoReserva.ANULADA)) {
             throw new ReglaNegocioException("dni", "El pasajero ya tiene un asiento en este viaje");
