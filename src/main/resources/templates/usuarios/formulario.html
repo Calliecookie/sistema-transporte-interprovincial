@@ -20,6 +20,12 @@
                     <input type="text" th:field="*{nombreUsuario}" maxlength="40" autocomplete="off" required>
                     <span class="error-campo" th:if="${#fields.hasErrors('nombreUsuario')}" th:errors="*{nombreUsuario}"></span>
                 </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('correo')} ? 'con-error'">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" th:field="*{correo}" maxlength="100" autocomplete="off" placeholder="nombre@correo.pe">
+                    <span class="ayuda">Permite iniciar sesión con el correo y recuperar la contraseña.</span>
+                    <span class="error-campo" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></span>
+                </div>
                 <div class="campo" th:classappend="${#fields.hasErrors('nombreCompleto')} ? 'con-error'">
                     <label for="nombreCompleto">Nombre completo</label>
                     <input type="text" th:field="*{nombreCompleto}" maxlength="100" required>

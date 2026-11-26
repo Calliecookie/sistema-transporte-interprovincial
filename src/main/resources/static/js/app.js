@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var estado = campo.parentElement.querySelector('[data-estado-dni]');
         var nombres = formulario.querySelector('[name="nombres"]');
         var apellidos = formulario.querySelector('[name="apellidos"]');
+        var nacimiento = formulario.querySelector('[name="fechaNacimiento"]');
         var inicial = campo.value;
         var ultimo = '';
 
@@ -87,6 +88,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         if (apellidos) {
                             apellidos.value = datos.apellidos;
+                        }
+                        if (nacimiento && datos.fechaNacimiento) {
+                            nacimiento.value = datos.fechaNacimiento;
                         }
                         mostrar(datos.mensaje, 'dni-ok');
                     } else if (datos.registrado) {

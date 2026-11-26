@@ -8,6 +8,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +21,9 @@ import org.springframework.stereotype.Component;
 public class ClienteFactiliza {
 
     private static final Logger REGISTRO = LoggerFactory.getLogger(ClienteFactiliza.class);
+
+    private static final List<DateTimeFormatter> FORMATOS_FECHA = List.of(DateTimeFormatter.ISO_LOCAL_DATE,
+            DateTimeFormatter.ofPattern("dd/MM/yyyy"), DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
     private final PropiedadesFactiliza propiedades;
     private final ObjectMapper mapeador;
@@ -72,6 +79,23 @@ public class ClienteFactiliza {
             return Optional.empty();
         }
         return Optional.of(new PersonaDni(dni, nombres, datos.path("apellido_paterno").asText("").strip(),
-                datos.path("apellido_materno").asText("").strip()));
+                datos.path("apellido_materno").asText("").strip(),
+                leerFecha(datos.path("fecha_nacimiento").asText(""))));
+    }
+
+    static LocalDate leerFecha(String texto) {
+        String valor = texto == null ? "" : texto.strip();
+        if (valor.isEmpty()) {
+            return null;
+        }
+        for (DateTimeFormatter formato : FORMATOS_FECHA) {
+            try {
+                LocalDate fecha = LocalDate.parse(valor, formato);
+                return fecha.isBefore(LocalDate.now()) ? fecha : null;
+            } catch (DateTimeParseException excepcion) {
+                continue;
+            }
+        }
+        return null;
     }
 }

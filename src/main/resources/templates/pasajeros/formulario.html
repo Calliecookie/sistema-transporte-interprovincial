@@ -19,7 +19,7 @@
                     <label for="dni">DNI</label>
                     <input type="text" th:field="*{dni}" maxlength="8" inputmode="numeric" pattern="\d{8}"
                            title="Ingrese los 8 dígitos del DNI" placeholder="8 dígitos" required data-consulta-dni="pasajero">
-                    <span class="ayuda" data-estado-dni>Al ingresar los 8 dígitos se completan los nombres y apellidos.</span>
+                    <span class="ayuda" data-estado-dni>Al ingresar los 8 dígitos se completan los nombres, apellidos y la fecha de nacimiento.</span>
                     <span class="error-campo" th:if="${#fields.hasErrors('dni')}" th:errors="*{dni}"></span>
                 </div>
                 <div class="campo" th:classappend="${#fields.hasErrors('fechaNacimiento')} ? 'con-error'">

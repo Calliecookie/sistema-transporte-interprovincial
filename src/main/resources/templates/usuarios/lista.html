@@ -21,11 +21,12 @@
             <div class="contenedor-tabla">
                 <table class="tabla">
                     <thead>
-                        <tr><th>Usuario</th><th>Nombre completo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr>
+                        <tr><th>Usuario</th><th>Correo</th><th>Nombre completo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
                     <tbody>
                         <tr th:each="u : ${usuarios}">
                             <td><strong th:text="${u.nombreUsuario}"></strong></td>
+                            <td th:text="${u.correo != null ? u.correo : '—'}"></td>
                             <td th:text="${u.nombreCompleto}"></td>
                             <td><span class="etiqueta" th:classappend="${u.rol.name() == 'ADMIN'} ? 'estado-en_curso' : 'estado-programado'" th:text="${u.rol.etiqueta}"></span></td>
                             <td><span class="etiqueta" th:classappend="${u.activo} ? 'estado-activo' : 'estado-inactivo'" th:text="${u.activo} ? 'Activo' : 'Inactivo'"></span></td>

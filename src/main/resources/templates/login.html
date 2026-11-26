@@ -17,20 +17,23 @@
     <section class="acceso-formulario">
         <form class="acceso-tarjeta" method="post" th:action="@{/login}">
             <h1>Iniciar sesión</h1>
-            <p class="ayuda">Ingrese con su usuario y contraseña para continuar.</p>
+            <p class="ayuda">Ingrese con su usuario o correo electrónico y su contraseña para continuar.</p>
 
             <div class="alerta alerta-error" th:if="${param.error}" role="alert">
-                Usuario o contraseña incorrectos. Si el problema continúa, consulte con el administrador.
+                Usuario, correo o contraseña incorrectos. Si el problema continúa, consulte con el administrador.
             </div>
             <div class="alerta alerta-error" th:if="${param.vencida}" role="alert">
                 Su sesión ya no es válida porque su cuenta cambió. Inicie sesión nuevamente.
+            </div>
+            <div class="alerta alerta-exito" th:if="${param.restablecida}" role="status">
+                Su contraseña se actualizó. Ya puede iniciar sesión.
             </div>
             <div class="alerta alerta-exito" th:if="${param.salir}" role="status">
                 Cerró su sesión correctamente.
             </div>
 
             <div class="campo">
-                <label for="username">Usuario</label>
+                <label for="username">Usuario o correo electrónico</label>
                 <input type="text" id="username" name="username" autocomplete="username" autofocus required>
             </div>
             <div class="campo">
@@ -38,6 +41,7 @@
                 <input type="password" id="password" name="password" autocomplete="current-password" required>
             </div>
             <button class="boton boton-primario boton-ancho" type="submit">Ingresar</button>
+            <p class="enlace-acceso"><a th:href="@{/recuperar}">¿Olvidó su contraseña?</a></p>
         </form>
     </section>
 </main>

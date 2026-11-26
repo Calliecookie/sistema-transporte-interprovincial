@@ -65,6 +65,7 @@ public class ServicioUsuario {
         FormularioUsuario formulario = new FormularioUsuario();
         formulario.setNombreUsuario(usuario.getNombreUsuario());
         formulario.setNombreCompleto(usuario.getNombreCompleto());
+        formulario.setCorreo(usuario.getCorreo());
         formulario.setRol(usuario.getRol());
         formulario.setActivo(usuario.isActivo());
         formulario.setIdConductor(usuario.getConductor() == null ? null : usuario.getConductor().getId());
@@ -80,6 +81,10 @@ public class ServicioUsuario {
         verificarConfirmacion(formulario);
         if (repositorio.existsByNombreUsuario(formulario.getNombreUsuario())) {
             throw new ReglaNegocioException("nombreUsuario", "Ya existe un usuario con ese nombre de usuario");
+        }
+        String correoNuevo = normalizarCorreo(formulario.getCorreo());
+        if (correoNuevo != null && repositorio.existsByCorreoIgnoreCase(correoNuevo)) {
+            throw new ReglaNegocioException("correo", "Ya existe un usuario con ese correo electrónico");
         }
         Usuario usuario = new Usuario();
         usuario.setConductor(resolverConductor(formulario, 0L));
@@ -97,6 +102,10 @@ public class ServicioUsuario {
         }
         if (repositorio.existsByNombreUsuarioAndIdNot(formulario.getNombreUsuario(), id)) {
             throw new ReglaNegocioException("nombreUsuario", "Ya existe otro usuario con ese nombre de usuario");
+        }
+        String correoNuevo = normalizarCorreo(formulario.getCorreo());
+        if (correoNuevo != null && repositorio.existsByCorreoIgnoreCaseAndIdNot(correoNuevo, id)) {
+            throw new ReglaNegocioException("correo", "Ya existe otro usuario con ese correo electrónico");
         }
         if (esElUsuarioActual(id)
                 && (formulario.getRol() != usuario.getRol() || !formulario.isActivo())) {
@@ -122,6 +131,10 @@ public class ServicioUsuario {
                     "No se puede eliminar el usuario porque registró reservas o ventas. Puede desactivarlo en su lugar");
         }
         repositorio.delete(usuario);
+    }
+
+    private String normalizarCorreo(String correo) {
+        return correo == null || correo.isBlank() ? null : correo.strip().toLowerCase();
     }
 
     private Conductor resolverConductor(FormularioUsuario formulario, Long id) {
@@ -153,6 +166,7 @@ public class ServicioUsuario {
     private void copiar(FormularioUsuario formulario, Usuario usuario) {
         usuario.setNombreUsuario(formulario.getNombreUsuario());
         usuario.setNombreCompleto(formulario.getNombreCompleto());
+        usuario.setCorreo(normalizarCorreo(formulario.getCorreo()));
         usuario.setRol(formulario.getRol());
         usuario.setActivo(formulario.isActivo());
     }

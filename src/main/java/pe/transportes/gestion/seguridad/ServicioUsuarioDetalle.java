@@ -18,8 +18,9 @@ public class ServicioUsuarioDetalle implements UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String nombreUsuario) throws UsernameNotFoundException {
-        return repositorio.findByNombreUsuario(nombreUsuario)
+    public UserDetails loadUserByUsername(String identificador) throws UsernameNotFoundException {
+        return repositorio.findByNombreUsuario(identificador)
+                .or(() -> repositorio.findByCorreoIgnoreCase(identificador))
                 .map(UsuarioDetalle::new)
                 .orElseThrow(() -> new UsernameNotFoundException("No existe el usuario indicado"));
     }

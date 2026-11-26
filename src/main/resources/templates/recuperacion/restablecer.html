@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Nueva contraseña')}"></head>
+<body class="cuerpo-acceso">
+<main class="acceso">
+    <section class="acceso-panel">
+        <div class="acceso-panel-contenido">
+            <span class="marca-simbolo"><th:block th:replace="~{fragmentos/iconos :: montanas}"></th:block></span>
+            <h2>Transportes Andinos</h2>
+            <p>Cree una nueva contraseña de entre 8 y 72 caracteres.</p>
+        </div>
+    </section>
+
+    <section class="acceso-formulario">
+        <form class="acceso-tarjeta" method="post" th:action="@{/restablecer}">
+            <h1>Nueva contraseña</h1>
+            <div class="alerta alerta-error" th:if="${mensajeError}" th:text="${mensajeError}" role="alert"></div>
+            <div class="alerta alerta-error" th:unless="${vigente}" role="alert">
+                El enlace no es válido o ya venció. Solicite uno nuevo.
+            </div>
+            <th:block th:if="${vigente}">
+                <input type="hidden" name="token" th:value="${token}">
+                <div class="campo">
+                    <label for="contrasena">Nueva contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" minlength="8" maxlength="72" autocomplete="new-password" autofocus required>
+                </div>
+                <div class="campo">
+                    <label for="confirmacion">Confirmar contraseña</label>
+                    <input type="password" id="confirmacion" name="confirmacion" minlength="8" maxlength="72" autocomplete="new-password" required>
+                </div>
+                <button class="boton boton-primario boton-ancho" type="submit">Guardar contraseña</button>
+            </th:block>
+            <p class="enlace-acceso" th:unless="${vigente}"><a th:href="@{/recuperar}">Solicitar un enlace nuevo</a></p>
+            <p class="enlace-acceso"><a th:href="@{/login}">Volver a iniciar sesión</a></p>
+        </form>
+    </section>
+</main>
+</body>
+</html>

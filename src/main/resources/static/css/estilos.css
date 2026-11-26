@@ -1474,3 +1474,9 @@ input.consultando {
         display: none !important;
     }
 }
+
+.enlace-acceso {
+    margin: 16px 0 0;
+    text-align: center;
+    font-size: 0.9rem;
+}

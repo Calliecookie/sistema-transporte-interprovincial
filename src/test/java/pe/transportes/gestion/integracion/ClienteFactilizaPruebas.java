@@ -30,6 +30,18 @@ class ClienteFactilizaPruebas {
     }
 
     @Test
+    void leeLaFechaDeNacimientoCuandoLaRespuestaLaIncluye() throws Exception {
+        String cuerpo = "{\"success\":true,\"data\":{\"nombres\":\"ANA\",\"apellido_paterno\":\"PEREZ\","
+                + "\"apellido_materno\":\"QUISPE\",\"fecha_nacimiento\":\"15/03/1990\"}}";
+
+        assertThat(cliente.interpretar(200, cuerpo, "12345678").get().fechaNacimiento())
+                .isEqualTo(java.time.LocalDate.of(1990, 3, 15));
+        assertThat(ClienteFactiliza.leerFecha("1990-03-15")).isEqualTo(java.time.LocalDate.of(1990, 3, 15));
+        assertThat(ClienteFactiliza.leerFecha("")).isNull();
+        assertThat(ClienteFactiliza.leerFecha("fecha rara")).isNull();
+    }
+
+    @Test
     void devuelveVacioCuandoNoExisteElDni() throws Exception {
         assertThat(cliente.interpretar(404, "", "12345678")).isEmpty();
         assertThat(cliente.interpretar(200, "{\"success\":false}", "12345678")).isEmpty();

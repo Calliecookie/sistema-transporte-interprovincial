@@ -17,7 +17,7 @@ Caso propuesto Nro. 7. Aplicación web para administrar buses, conductores, ruta
 2. Abra el archivo `base_datos/transporte_interprovincial.sql` (menú File > Open SQL Script).
 3. Ejecute todo el script de una sola vez con el icono del rayo.
 4. Si la base `transporte_interprovincial` ya existía, el script la elimina y la vuelve a crear con los datos de prueba.
-5. Si prefiere conservar los datos de una instalación anterior, ejecute solo `base_datos/actualizacion_1_1_0.sql`.
+5. Si prefiere conservar los datos de una instalación anterior, ejecute solo los scripts de actualización que le falten, en orden: `actualizacion_1_1_0.sql` y luego `actualizacion_1_2_0.sql`.
 
 ### 2. Abrir el proyecto en NetBeans
 
@@ -46,7 +46,24 @@ factiliza.token=su_token
 
 Sin token la aplicación funciona igual y los datos se ingresan a mano.
 
-### 5. Ejecutar
+### 5. Correo para recuperar la contraseña
+
+En la pantalla de inicio de sesión, "¿Olvidó su contraseña?" envía al correo del usuario un enlace de un solo uso, vigente 30 minutos, para crear una nueva contraseña. El sistema guarda solo la huella del enlace, nunca el enlace, y permite 3 solicitudes por hora por usuario.
+
+Para que el correo salga de verdad, defina estas variables de entorno (por ejemplo, una cuenta de Gmail con contraseña de aplicación):
+
+```
+CORREO_SERVIDOR=smtp.gmail.com
+CORREO_PUERTO=587
+CORREO_USUARIO=su_cuenta@gmail.com
+CORREO_CONTRASENA=contraseña_de_aplicacion
+CORREO_REMITENTE=su_cuenta@gmail.com
+URL_PUBLICA=http://localhost:8081
+```
+
+Sin `CORREO_SERVIDOR`, el enlace se escribe en la consola de la aplicación, lo que sirve para probar y para una demostración.
+
+### 6. Ejecutar
 
 Presione F6 (Run Project). No hace falta configurar ningún servidor: Tomcat viene incluido.
 Cuando la consola muestre `Started AplicacionTransporte`, abra http://localhost:8081 en el navegador.
@@ -63,6 +80,8 @@ Los usuarios se crean al iniciar la aplicación, solo cuando la tabla `usuario` 
 | vendedor | Vendedor123*  | VENDEDOR |
 | conductor | Conductor123* | CONDUCTOR (vinculado al primer conductor activo) |
 
+Se puede ingresar con el usuario o con el correo (por ejemplo `admin@transportes-andinos.example`). Los correos de estos usuarios de prueba son ficticios: cámbielos desde Usuarios para probar la recuperación con un correo real.
+
 Para crear más cuentas de conductor, el administrador entra a Usuarios, elige el rol Conductor y selecciona el conductor que usará la cuenta.
 
 ## Permisos por rol
@@ -78,6 +97,8 @@ Para crear más cuentas de conductor, el administrador entra a Usuarios, elige e
 | Buses, conductores, destinos y rutas                 |  Sí   |    No    |    No     |
 | Usuarios del sistema                                 |  Sí   |    No    |    No     |
 | Mis viajes (rutas, horarios, ocupación, pasajeros y reportes de ruta) |  No   |    No    |    Sí     |
+
+Los permisos de Vendedor y Conductor se pueden cambiar en **Roles y permisos** (solo el administrador): marque qué módulos puede usar cada rol (pasajeros, ventas y reservas, pasajes vendidos, reportes, alertas, mis viajes). Los valores iniciales son los de la tabla. La gestión de buses, conductores, destinos, rutas, viajes y usuarios es exclusiva del administrador.
 
 La restricción se aplica en tres niveles: en las rutas (`SecurityFilterChain`), en los métodos de los servicios (`@PreAuthorize`) y en las vistas (los menús y botones se ocultan según el rol). Si un usuario entra a una dirección que no le corresponde, ve la página 403.
 
@@ -97,7 +118,8 @@ Recomendaciones: formato JPG, menos de 400 KB cada una (calidad 75 a 80), y pref
 
 ```
 base_datos/                      script SQL con las tablas y los datos de prueba
-base_datos/actualizacion_1_1_0.sql  actualiza una base ya creada con la versión anterior
+base_datos/actualizacion_1_1_0.sql  actualiza una base de la versión 1.0 a la 1.1
+base_datos/actualizacion_1_2_0.sql  actualiza una base de la versión 1.1 a la 1.2
 src/main/java/pe/transportes/gestion
     modelo/                      entidades JPA, enumeraciones y formularios
     repositorio/                 interfaces Spring Data y especificaciones de filtros
@@ -107,6 +129,7 @@ src/main/java/pe/transportes/gestion
     util/                        excepciones, exportador CSV y utilidades
     configuracion/               configuración general
     integracion/                 consulta de DNI con la API de Factiliza
+    recuperacion/                recuperación de contraseña y envío de correo
 src/main/resources
     templates/                   vistas Thymeleaf
     static/                      CSS, JavaScript e imágenes

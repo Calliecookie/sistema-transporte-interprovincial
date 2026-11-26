@@ -1,5 +1,6 @@
 package pe.transportes.gestion.modelo;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -15,6 +16,10 @@ public class FormularioUsuario {
     @NotBlank(message = "El nombre completo es obligatorio")
     @Size(max = 100, message = "El nombre completo no puede superar los 100 caracteres")
     private String nombreCompleto;
+
+    @Email(message = "Ingrese un correo electrónico válido")
+    @Size(max = 100, message = "El correo no puede superar los 100 caracteres")
+    private String correo;
 
     @NotNull(message = "Seleccione un rol")
     private Rol rol;
@@ -42,6 +47,14 @@ public class FormularioUsuario {
 
     public void setNombreUsuario(String nombreUsuario) {
         this.nombreUsuario = nombreUsuario;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
     }
 
     public String getNombreCompleto() {

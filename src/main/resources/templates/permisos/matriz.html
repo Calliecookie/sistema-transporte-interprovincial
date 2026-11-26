@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Permisos')}"></head>
+<body>
+<div class="estructura">
+    <aside th:replace="~{fragmentos/base :: menu('permisos')}"></aside>
+    <main class="contenido">
+        <header th:replace="~{fragmentos/base :: encabezado('Roles y permisos')}"></header>
+        <div th:replace="~{fragmentos/base :: mensajes}"></div>
+
+        <form class="panel" method="post" th:action="@{/permisos}">
+            <div class="panel-cabecera">
+                <div>
+                    <h2>Permisos por rol</h2>
+                    <p>Marque los módulos que puede usar cada rol. El administrador tiene acceso a todo y la gestión de buses, conductores, rutas, viajes y usuarios es solo suya. Los cambios se aplican en la siguiente página que abra el usuario.</p>
+                </div>
+            </div>
+            <div class="contenedor-tabla">
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>Módulo</th>
+                            <th class="centro">Administrador</th>
+                            <th class="centro">Vendedor</th>
+                            <th class="centro">Conductor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="m : ${modulos}">
+                            <td><strong th:text="${m.etiqueta}"></strong><br><small th:text="${m.descripcion}"></small></td>
+                            <td class="centro"><input type="checkbox" checked disabled aria-label="Administrador"></td>
+                            <td class="centro">
+                                <input type="checkbox" name="vendedor" th:value="${m.name()}" th:checked="${vendedor.contains(m)}"
+                                       th:disabled="${m.rolAplicable.name() != 'VENDEDOR'}" th:aria-label="${'Vendedor: ' + m.etiqueta}">
+                            </td>
+                            <td class="centro">
+                                <input type="checkbox" name="conductor" th:value="${m.name()}" th:checked="${conductor.contains(m)}"
+                                       th:disabled="${m.rolAplicable.name() != 'CONDUCTOR'}" th:aria-label="${'Conductor: ' + m.etiqueta}">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="acciones-formulario">
+                <button class="boton boton-primario" type="submit">Guardar permisos</button>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>

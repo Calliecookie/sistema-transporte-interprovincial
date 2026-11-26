@@ -47,9 +47,20 @@ public class Usuario {
     @Column(name = "activo", nullable = false)
     private boolean activo = true;
 
+    @Column(name = "correo", unique = true, length = 100)
+    private String correo;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "conductor_id")
     private Conductor conductor;
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
 
     public Conductor getConductor() {
         return conductor;

@@ -17,7 +17,7 @@
         <span class="marca-texto"><strong>Transportes</strong><small>Andinos</small></span>
     </a>
     <nav>
-        <div class="menu-grupo" sec:authorize="hasRole('CONDUCTOR')">
+        <div class="menu-grupo" th:if="${modulosPermitidos != null and modulosPermitidos.contains('MIS_VIAJES') and !#authorization.expression('hasRole(''ADMIN'')')}">
             <p class="menu-seccion">Conductor</p>
             <a class="menu-enlace" th:classappend="${activo == 'mis-viajes'} ? 'activo'" th:href="@{/mis-viajes}">
                 <th:block th:replace="~{fragmentos/iconos :: volante}"></th:block><span>Mis viajes</span>
@@ -29,26 +29,26 @@
         <a class="menu-enlace" th:classappend="${activo == 'panel'} ? 'activo'" th:href="@{/}">
             <th:block th:replace="~{fragmentos/iconos :: casa}"></th:block><span>Inicio</span>
         </a>
-        <a class="menu-enlace" th:classappend="${activo == 'alertas'} ? 'activo'" th:href="@{/alertas}">
+        <a class="menu-enlace" th:classappend="${activo == 'alertas'} ? 'activo'" th:href="@{/alertas}" th:if="${modulosPermitidos != null and modulosPermitidos.contains('ALERTAS')}">
             <th:block th:replace="~{fragmentos/iconos :: aviso}"></th:block><span>Alertas de viaje</span>
             <span class="insignia-alerta" data-conteo-alertas th:classappend="${alertasPendientes == null or alertasPendientes == 0} ? 'oculto'"
                   th:text="${alertasPendientes}">0</span>
         </a>
 
         <p class="menu-seccion">Ventas</p>
-        <a class="menu-enlace" th:classappend="${activo == 'pasajeros'} ? 'activo'" th:href="@{/pasajeros}">
+        <a class="menu-enlace" th:classappend="${activo == 'pasajeros'} ? 'activo'" th:href="@{/pasajeros}" th:if="${modulosPermitidos != null and modulosPermitidos.contains('PASAJEROS')}">
             <th:block th:replace="~{fragmentos/iconos :: usuarios}"></th:block><span>Pasajeros</span>
         </a>
-        <a class="menu-enlace" th:classappend="${activo == 'venta'} ? 'activo'" th:href="@{/reservas/viajes}">
+        <a class="menu-enlace" th:classappend="${activo == 'venta'} ? 'activo'" th:href="@{/reservas/viajes}" th:if="${modulosPermitidos != null and modulosPermitidos.contains('VENTAS')}">
             <th:block th:replace="~{fragmentos/iconos :: pasaje}"></th:block><span>Vender pasajes</span>
         </a>
-        <a class="menu-enlace" th:classappend="${activo == 'reservas'} ? 'activo'" th:href="@{/reservas}">
+        <a class="menu-enlace" th:classappend="${activo == 'reservas'} ? 'activo'" th:href="@{/reservas}" th:if="${modulosPermitidos != null and modulosPermitidos.contains('VENTAS')}">
             <th:block th:replace="~{fragmentos/iconos :: reserva}"></th:block><span>Reservas</span>
         </a>
-        <a class="menu-enlace" th:classappend="${activo == 'pasajes'} ? 'activo'" th:href="@{/pasajes}">
+        <a class="menu-enlace" th:classappend="${activo == 'pasajes'} ? 'activo'" th:href="@{/pasajes}" th:if="${modulosPermitidos != null and modulosPermitidos.contains('PASAJES')}">
             <th:block th:replace="~{fragmentos/iconos :: dinero}"></th:block><span>Pasajes vendidos</span>
         </a>
-        <a class="menu-enlace" th:classappend="${activo == 'reportes'} ? 'activo'" th:href="@{/reportes}">
+        <a class="menu-enlace" th:classappend="${activo == 'reportes'} ? 'activo'" th:href="@{/reportes}" th:if="${modulosPermitidos != null and modulosPermitidos.contains('REPORTES')}">
             <th:block th:replace="~{fragmentos/iconos :: grafico}"></th:block><span>Reportes</span>
         </a>
         </div>
@@ -72,6 +72,9 @@
             </a>
             <a class="menu-enlace" th:classappend="${activo == 'usuarios'} ? 'activo'" th:href="@{/usuarios}">
                 <th:block th:replace="~{fragmentos/iconos :: escudo}"></th:block><span>Usuarios</span>
+            </a>
+            <a class="menu-enlace" th:classappend="${activo == 'permisos'} ? 'activo'" th:href="@{/permisos}">
+                <th:block th:replace="~{fragmentos/iconos :: escudo}"></th:block><span>Roles y permisos</span>
             </a>
         </div>
     </nav>

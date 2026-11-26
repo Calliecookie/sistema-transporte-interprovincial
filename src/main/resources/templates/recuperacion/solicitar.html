@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es-PE" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos/base :: cabecera('Recuperar contraseña')}"></head>
+<body class="cuerpo-acceso">
+<main class="acceso">
+    <section class="acceso-panel">
+        <div class="acceso-panel-contenido">
+            <span class="marca-simbolo"><th:block th:replace="~{fragmentos/iconos :: montanas}"></th:block></span>
+            <h2>Transportes Andinos</h2>
+            <p>Recupere el acceso a su cuenta con el correo electrónico registrado.</p>
+        </div>
+    </section>
+
+    <section class="acceso-formulario">
+        <form class="acceso-tarjeta" method="post" th:action="@{/recuperar}">
+            <h1>Recuperar contraseña</h1>
+            <div class="alerta alerta-exito" th:if="${enviado}" role="status">
+                Si los datos corresponden a una cuenta con correo registrado, enviamos un enlace para crear una nueva contraseña. Revise su bandeja de entrada.
+            </div>
+            <th:block th:unless="${enviado}">
+                <p class="ayuda">Ingrese su usuario o correo electrónico y le enviaremos un enlace para crear una nueva contraseña.</p>
+                <div class="campo">
+                    <label for="identificador">Usuario o correo electrónico</label>
+                    <input type="text" id="identificador" name="identificador" maxlength="100" autocomplete="username" autofocus required>
+                </div>
+                <button class="boton boton-primario boton-ancho" type="submit">Enviar enlace</button>
+            </th:block>
+            <p class="enlace-acceso"><a th:href="@{/login}">Volver a iniciar sesión</a></p>
+        </form>
+    </section>
+</main>
+</body>
+</html>

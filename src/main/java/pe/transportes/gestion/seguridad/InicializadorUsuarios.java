@@ -32,23 +32,26 @@ public class InicializadorUsuarios implements ApplicationRunner {
         if (repositorio.count() > 0) {
             return;
         }
-        repositorio.save(crear("admin", "Administrador del sistema", "Admin123*", Rol.ADMIN));
-        repositorio.save(crear("vendedor", "Vendedor de ventanilla", "Vendedor123*", Rol.VENDEDOR));
+        repositorio.save(crear("admin", "Administrador del sistema", "Admin123*", Rol.ADMIN, "admin@transportes-andinos.example"));
+        repositorio.save(crear("vendedor", "Vendedor de ventanilla", "Vendedor123*", Rol.VENDEDOR, "vendedor@transportes-andinos.example"));
         registro.info("Se crearon los usuarios iniciales admin y vendedor");
         conductorRepositorio.findFirstByActivoTrueOrderByIdAsc().ifPresent(conductor -> {
-            Usuario usuario = crear("conductor", conductor.getNombreCompleto(), "Conductor123*", Rol.CONDUCTOR);
+            Usuario usuario = crear("conductor", conductor.getNombreCompleto(), "Conductor123*", Rol.CONDUCTOR,
+                    "conductor@transportes-andinos.example");
             usuario.setConductor(conductor);
             repositorio.save(usuario);
             registro.info("Se creó el usuario inicial conductor");
         });
     }
 
-    private Usuario crear(String nombreUsuario, String nombreCompleto, String contrasena, Rol rol) {
+    private Usuario crear(String nombreUsuario, String nombreCompleto, String contrasena, Rol rol,
+            String correo) {
         Usuario usuario = new Usuario();
         usuario.setNombreUsuario(nombreUsuario);
         usuario.setNombreCompleto(nombreCompleto);
         usuario.setContrasena(codificador.encode(contrasena));
         usuario.setRol(rol);
+        usuario.setCorreo(correo);
         usuario.setActivo(true);
         return usuario;
     }
